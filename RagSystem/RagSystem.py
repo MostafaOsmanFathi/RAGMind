@@ -1,6 +1,5 @@
 import os
 import chromadb
-from openai import OpenAI
 from chromadb.utils import embedding_functions
 import hashlib
 
@@ -11,13 +10,11 @@ class RagSystem:
     def __init__(self, db_collection_name: str, api_key: str):
         self.db_collection_name = db_collection_name
         self.api_key = api_key
-        self.openai_ef = embedding_functions.OpenAIEmbeddingFunction(api_key=api_key,
-                                                                     model_name="text-embedding-3-small")
 
         self.chroma_client = chromadb.PersistentClient(path=f'{RagSystem.db_collection_root}')
         self.collection = self.chroma_client.get_or_create_collection(self.db_collection_name)
 
-        self.llm_client = OpenAI(api_key=self.api_key)
+        # self.llm_client = OpenAI(api_key=self.api_key)
         self.n_results_query = 2
 
     @classmethod
@@ -40,10 +37,6 @@ class RagSystem:
             chunks.append({'id': f'{file_id}_chunk_{cnt + 1}', 'text': chunk_text})
         return chunks
 
-    def _embed_document(self, chunk_text):
-        response = self.llm_client.embeddings.create(input=chunk_text, model="text-embedding-3-small")
-        embedding = response.data[0].embedding
-        return embedding
 
     def add_document(self, document_path: str) -> bool:
         try:
@@ -53,33 +46,43 @@ class RagSystem:
             with open(document_path, 'r', encoding='utf-8') as f:
                 text = f.read()
 
-            chunks = self._chunk_document(text, file_hash_id)
-            for chunk in chunks:
-                chunk['embedding'] = self._embed_document(chunk['text'])
+            # Check if document already exists by metadata
+            existing = self.collection.query(
+                query_texts=[file_hash_id],
+                n_results=1,
+                include=["metadatas"]  # modern Chroma supports only these fields
+            )
 
+            if existing['metadatas'] and any(m['file_hash_id'] == file_hash_id for m in existing['metadatas'][0]):
+                print(f"Document {document_path} already exists with hash_id {file_hash_id}")
+                return True
+
+            chunks = self._chunk_document(text, file_hash_id)
+
+            # Upsert to Chroma
             self.collection.upsert(
                 ids=[chunk['id'] for chunk in chunks],
                 documents=[chunk['text'] for chunk in chunks],
-                embeddings=[chunk['embedding'] for chunk in chunks],
-                metadatas=[{'file_name': file_name, 'file_path': document_path, 'chunk_id': chunk['id'],
-                            'file_hash_id': file_hash_id} for chunk in
-                           chunks]
+                metadatas=[{
+                    'file_name': file_name,
+                    'file_path': document_path,
+                    'chunk_id': chunk['id'],
+                    'file_hash_id': file_hash_id
+                } for chunk in chunks]
             )
             print(f"Inserted {len(chunks)} chunks from {file_name} with hash_id {file_hash_id}")
-
             return True
         except Exception as e:
             print(e)
             return False
 
     def _query_document(self, question: str):
-        query_embedding = self._embed_document(question)
         results = self.collection.query(
-            query_embeddings=[query_embedding],
+            query_texts=[question],
             n_results=self.n_results_query,
-            include=['documents', 'metadatas', 'ids']
+            include=['documents', 'metadatas']  # remove deprecated 'ids'
         )
-        # relevant_chunks = [doc for sublist in results["documents"] for doc in sublist]
+
         relevant_chunks = [
             f"{meta['file_name']}: {doc}" for doc, meta in zip(results['documents'][0], results['metadatas'][0])
         ]
@@ -98,24 +101,14 @@ class RagSystem:
 
     Context / Relevant document chunks:
     {context}
+    
+    user ask about: {question}
     """
 
         # noinspection PyTypeChecker
-        response = self.llm_client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": prompt
-                },
-                {
-                    "role": "user",
-                    "content": question
-                }
-            ]
-        )
 
-        return response.choices[0].message["content"]
+
+        return prompt
 
     def ask_question(self, question: str) -> str:
         try:

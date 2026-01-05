@@ -37,7 +37,6 @@ class RagSystem:
             chunks.append({'id': f'{file_id}_chunk_{cnt + 1}', 'text': chunk_text})
         return chunks
 
-
     def add_document(self, document_path: str) -> bool:
         try:
             file_hash_id = RagSystem.generate_file_id(document_path)
@@ -46,15 +45,17 @@ class RagSystem:
             with open(document_path, 'r', encoding='utf-8') as f:
                 text = f.read()
 
-            # Check if document already exists by metadata
-            existing = self.collection.query(
-                query_texts=[file_hash_id],
-                n_results=1,
-                include=["metadatas"]  # modern Chroma supports only these fields
-            )
+            existing_docs = self.collection.get(include=["metadatas"])
+            already_exists = False
+            for metadata in existing_docs['metadatas']:
+                if metadata['file_hash_id'] == file_hash_id:
+                        already_exists = True
+                        break
+                if already_exists:
+                    break
 
-            if existing['metadatas'] and any(m['file_hash_id'] == file_hash_id for m in existing['metadatas'][0]):
-                print(f"Document {document_path} already exists with hash_id {file_hash_id}")
+            if already_exists:
+                print(f"=====Document {document_path} already exists with hash_id {file_hash_id}")
                 return True
 
             chunks = self._chunk_document(text, file_hash_id)
@@ -73,7 +74,7 @@ class RagSystem:
             print(f"Inserted {len(chunks)} chunks from {file_name} with hash_id {file_hash_id}")
             return True
         except Exception as e:
-            print(e)
+            print("Error inserting document:", e)
             return False
 
     def _query_document(self, question: str):

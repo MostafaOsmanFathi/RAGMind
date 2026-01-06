@@ -7,5 +7,5 @@ class AbstractEmbed(ABC):
         self.embedding_fn=None
 
     @abstractmethod
-    def get_chromadb_embade_function(self)-> embedding_functions.EmbeddingFunction:
+    def get_chromadb_embed_function(self)-> embedding_functions.EmbeddingFunction:
         return self.embedding_fn

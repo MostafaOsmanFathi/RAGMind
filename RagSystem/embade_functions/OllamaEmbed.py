@@ -11,3 +11,8 @@ class OllamaEmbed(AbstractEmbed):
             self.embedding_fn=embedding_functions.OllamaEmbeddingFunction(model_name=self.llm_model_name)
         else:
             self.embedding_fn=embedding_functions.OllamaEmbeddingFunction(model_name=self.llm_model_name,url=self.ollama_url)
+
+    def get_chromadb_embed_function(self) -> embedding_functions.EmbeddingFunction:
+        if self.embedding_fn is None:
+            raise Exception('OllamaEmbed not implemented')
+        return self.embedding_fn

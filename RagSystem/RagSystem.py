@@ -14,7 +14,6 @@ class RagSystem:
         self.chroma_client = chromadb.PersistentClient(path=f'{RagSystem.db_collection_root}')
         self.collection = self.chroma_client.get_or_create_collection(self.db_collection_name)
 
-        # self.llm_client = OpenAI(api_key=self.api_key)
         self.n_results_query = 2
 
     @classmethod
@@ -106,10 +105,27 @@ class RagSystem:
     user ask about: {question}
     """
 
-        # noinspection PyTypeChecker
-
+        #TODO connect it with LLM
 
         return prompt
+
+
+    def query_expansion(self, question: str) -> str:
+        query_expansion_prompt = f"""
+        You are an assistant that rewrites user queries to improve retrieval from a document collection. 
+        Your task is to expand the query with context cues so that the search system retrieves the most relevant documents, including small or overlooked documents.
+
+        Rules:
+        1. Preserve the original intent of the query.
+        2. Add context keywords, document types, or hints to make it clear which document is most relevant.
+        3. Include synonyms, related terms, or clarifying details that help match the right document.
+        4. Keep the expanded query concise and relevant — no extra unrelated words.
+        5. Output only the expanded query, nothing else.
+
+        User query: "{question}"
+        """
+        #TODO connect it with LLM
+        return question
 
     def ask_question(self, question: str) -> str:
         try:

@@ -1,13 +1,11 @@
 from abc import ABC, abstractmethod
 from chromadb.utils import embedding_functions
 
-class AbstractEmbade(ABC):
-    def __init__(self,llm_url,llm_model_name,llm_api_key):
-        self.llm_url = llm_url
+class AbstractEmbed(ABC):
+    def __init__(self,llm_model_name):
         self.llm_model_name = llm_model_name
-        self.llm_api_key = llm_api_key
-
+        self.embedding_fn=None
 
     @abstractmethod
     def get_chromadb_embade_function(self)-> embedding_functions.EmbeddingFunction:
-        pass
+        return self.embedding_fn

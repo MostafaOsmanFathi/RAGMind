@@ -1,15 +1,17 @@
 import chromadb
 from . import vectordb_utils
+from .ChromadbClient import ChromadbClient
 import os
 
+
 class ChromadbManger:
-    def __init__(self, persistent_client_path,db_collection_name: str,n_results_query:int=2,embedding_fun=None):
-        self.persistent_client_path = persistent_client_path
+    def __init__(self,db_collection_name: str,n_results_query:int=2,embedding_fun=None):
         self.db_collection_name = db_collection_name
         self.n_results_query = n_results_query
         self.embedding_fun = embedding_fun
 
-        self.chroma_client = chromadb.PersistentClient(path=persistent_client_path)
+        self.chroma_client = ChromadbClient().load_client()
+
         if embedding_fun is None:
             self.collection = self.chroma_client.get_or_create_collection(self.db_collection_name)
         else:
@@ -26,10 +28,10 @@ class ChromadbManger:
             if metadata['file_hash_id'] == file_hash_id:
                 already_exists = True
                 break
-            if already_exists:
-                break
 
-        print(f"Document {document_path} already exists with hash_id {file_hash_id}")
+        if already_exists:
+            print(f"Document {document_path} already exists with hash_id {file_hash_id}")
+
         return already_exists
 
     def add_document(self, document_path: str) -> bool:

@@ -5,7 +5,9 @@ from chromadb.utils import embedding_functions
 class OllamaEmbed(AbstractEmbed):
     def __init__(self,llm_model_name , ollama_url: str = None):
         super().__init__(llm_model_name)
-        self.ollama_url = ollama_url
+
+        if ollama_url is None:
+            self.ollama_url = os.getenv("OLLAMA_URL",None)
 
         if self.ollama_url is None:
             self.embedding_fn=embedding_functions.OllamaEmbeddingFunction(model_name=self.llm_model_name)

@@ -14,7 +14,7 @@ class RagSystem:
                  embedding_fun = NomicEmbed().embedding_fn,
                  llm_model=MistralLLM(),
                 prompt_manger=DefaultPrompt(),
-                 n_results_query:int=5):
+                 n_results_query:int=10):
 
         self.embedding_fun = embedding_fun
         self.vectordb=ChromadbManger(RagSystem.db_collection_root,db_collection_name,n_results_query,self.embedding_fun)

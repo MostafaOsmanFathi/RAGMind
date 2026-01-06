@@ -1,7 +1,5 @@
 import os
-from http.client import responses
-
-import AbstractLLM
+from AbstractLLM import AbstractLLM
 import ollama
 
 class OllamaLLM(AbstractLLM):

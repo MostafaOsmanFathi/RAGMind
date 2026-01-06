@@ -61,3 +61,16 @@ class ChromadbManger:
         except Exception as e:
             print("Error inserting document:", e)
             return False
+
+    def query_document(self, question: str):
+        results = self.collection.query(
+            query_texts=[question],
+            n_results=3,
+            include=['documents', 'metadatas']  # remove deprecated 'ids'
+        )
+
+        relevant_chunks = [
+            f"{meta['file_name']}: {doc}" for doc, meta in zip(results['documents'][0], results['metadatas'][0])
+        ]
+
+        return relevant_chunks

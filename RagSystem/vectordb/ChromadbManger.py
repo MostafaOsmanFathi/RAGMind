@@ -65,7 +65,7 @@ class ChromadbManger:
     def query_document(self, question: str):
         results = self.collection.query(
             query_texts=[question],
-            n_results=3,
+            n_results=self.n_results_query,
             include=['documents', 'metadatas']  # remove deprecated 'ids'
         )
 

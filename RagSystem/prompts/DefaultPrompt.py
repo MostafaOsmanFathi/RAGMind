@@ -6,58 +6,59 @@ class DefaultPrompt(AbstractPrompts):
     def __init__(self):
         super().__init__()
 
-    def query_hypothetical_answers(self, question: str) -> List[dict]:
+    def query_hypothetical_answers(self, questions: str) -> List[dict]:
         """
-        Generate multiple plausible ways topics or concepts could be described in documents.
-        Each topic/question should produce exactly 2 hypothetical answers using synonyms,
-        alternate phrasings, or related concepts.
+        Generate plausible variations (hypothetical answers) for multiple queries at once.
+        Each query should produce 1–2 answers using synonyms, paraphrases, or related concepts.
+        The output format pairs each query with its answers, separated by a newline.
         """
         prompt = f"""
-You are an AI assistant tasked with generating multiple plausible ways topics or concepts could appear in documents. 
-Do NOT provide definitive answers. Instead, imagine **all possible contexts, variations, or phrasings**.
+You are an AI assistant tasked with generating plausible ways topics or concepts could appear in documents.
+Do NOT provide definitive answers. Imagine all possible contexts, variations, or phrasings.
 
-For each topic or question in the list provided, generate exactly 2 hypothetical answers, in the same order as the questions.
-
-Rules:
-1. Provide **exactly 2 different hypothetical answers** per topic/question.
-2. Use synonyms, alternate phrasings, or related concepts when appropriate.
-3. Return only the hypothetical answers as separate bullet points or lines, **grouped by question in order**.
+Instructions:
+1. The input is a list of queries, one per line.
+2. For each query, generate 1–2 hypothetical answers that might appear in documents.
+3. Use synonyms, paraphrases, or related concepts.
+4. Output each query immediately followed by its hypothetical answers.
+5. Separate each query block (query + answers) by a single newline.
+6. Do NOT include explanations, commentary, or extra text.
+7. Use bullet points or separate lines for multiple answers per query.
 """
-        return self._parse_prompt(prompt, question)
+        return self._parse_prompt(prompt, questions)
 
     def multiple_query(self, question: str, expand_by: int = 3) -> List[dict]:
         """
-        Expand the user query with context cues to improve document retrieval.
-        The output should be exactly `expand_by` extra queries that preserve intent
-        and add relevant keywords or synonyms.
+        Expand a user query into multiple variants for document retrieval.
+        All expansions are returned at once to reduce LLM calls.
         """
         prompt = f"""
-You are an assistant that rewrites user queries to improve retrieval from a document collection. 
-Your task is to expand the query so that the search system retrieves the most relevant documents, 
-including smaller or less obvious ones.
+You are an AI assistant that rewrites a user query to improve document retrieval.
+Expand the query into {expand_by} variants that preserve intent, add relevant keywords, synonyms, or clarifying hints, 
+and improve retrieval coverage.
 
 Rules:
-1. Preserve the original intent of the query.
-2. Add context keywords, document types, or hints for better relevance.
-3. Include synonyms, related terms, or clarifying details.
-4. Keep the expanded query concise and relevant — no unrelated words.
-5. Output only the expanded queries, nothing else.
-6. Generate exactly {expand_by} extra queries.
+1. Keep each expanded query concise and relevant.
+2. Include terms that increase matching with documents.
+3. Output exactly {expand_by} expanded queries, one per line.
+4. Separate each query by a newline.
+5. Do NOT add explanations, commentary, or extra text.
 """
         return self._parse_prompt(prompt, question)
 
     def answer_context(self, question: str, context: str) -> List[dict]:
         """
-        Answer a question using ONLY the provided context.
-        Must reference the source if useful and explicitly state when information is missing.
+        Answer a user question using ONLY the provided context.
+        Hypothetical answers should NOT be included here.
         """
         prompt = f"""
-You are an AI assistant with access to private documents. Answer user questions **using ONLY the content provided below**.
-Follow these rules:
-1. Use only the information provided in the documents. Do NOT make assumptions or use external knowledge.
-2. If the answer is not found in the documents, respond: "I could not find relevant information in the documents."
-3. Provide concise, clear, and accurate answers.
-4. You may reference the source or file name if it helps clarity.
+You are an AI assistant with access to private documents. Answer the user question **using ONLY the content below**.
+
+Rules:
+1. Do NOT assume anything not present in the context.
+2. If the answer is not found, respond: "I could not find relevant information in the documents."
+3. Provide concise, accurate answers.
+4. You may reference the source or file name if useful.
 
 Context / Relevant document chunks:
 {context}

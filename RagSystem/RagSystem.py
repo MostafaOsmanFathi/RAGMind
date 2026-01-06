@@ -7,14 +7,13 @@ import hashlib
 class RagSystem:
     db_collection_root = 'chromadb_root'
 
-    def __init__(self, db_collection_name: str, api_key: str):
+    def __init__(self, db_collection_name: str,n_results_query:int=2):
         self.db_collection_name = db_collection_name
-        self.api_key = api_key
 
         self.chroma_client = chromadb.PersistentClient(path=f'{RagSystem.db_collection_root}')
         self.collection = self.chroma_client.get_or_create_collection(self.db_collection_name)
 
-        self.n_results_query = 2
+        self.n_results_query = n_results_query
 
     @classmethod
     def generate_file_id(cls, file_path: str) -> str:
@@ -89,7 +88,7 @@ class RagSystem:
 
         return relevant_chunks
 
-    def prompt_llm(self, question: str, context: str) -> str:
+    def _prompt_llm(self, question: str, context: str) -> str:
         # System prompt: instructions to stay grounded in the retrieved documents
         prompt = f"""
     You are an AI assistant with access to private documents. Answer user questions **using ONLY the content provided below**.
@@ -110,7 +109,7 @@ class RagSystem:
         return prompt
 
 
-    def query_expansion(self, question: str) -> str:
+    def _mutiple_query_expansion(self, question: str) -> str:
         query_expansion_prompt = f"""
         You are an assistant that rewrites user queries to improve retrieval from a document collection. 
         Your task is to expand the query with context cues so that the search system retrieves the most relevant documents, including small or overlooked documents.
@@ -121,11 +120,32 @@ class RagSystem:
         3. Include synonyms, related terms, or clarifying details that help match the right document.
         4. Keep the expanded query concise and relevant — no extra unrelated words.
         5. Output only the expanded query, nothing else.
-
+        6. Return the results in json format list of string each has the query.
+        
         User query: "{question}"
         """
         #TODO connect it with LLM
         return question
+
+
+    def _query_hypothetical_answers(self, question: str) -> str:
+        query_hypothetical_answers_prompt = f"""
+        You are an AI assistant tasked with expanding a user's question into multiple plausible ways the answer could exist in documents. 
+        Do not answer the question directly. Instead, imagine **all possible variations, contexts, or phrasings** in which the answer could appear. 
+        Think creatively and logically about the content that might exist in documents.
+
+        Rules:
+        1. Generate 3-5 different hypothetical ways the answer could be expressed in a document.
+        2. Include synonyms, alternate phrasing, and related concepts.
+        3. Focus on expanding the question to maximize document retrieval relevance.
+        4. Return only the expanded versions as separate bullet points or lines.
+
+        Original question: "{question}"
+        """
+
+        #TODO connect it with LLM
+        return query_hypothetical_answers_prompt
+
 
     def ask_question(self, question: str) -> str:
         try:

@@ -1,5 +1,5 @@
 import os
-from AbstractLLM import AbstractLLM
+from .AbstractLLM import AbstractLLM
 import ollama
 
 class OllamaLLM(AbstractLLM):

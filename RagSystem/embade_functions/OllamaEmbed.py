@@ -1,4 +1,4 @@
-from RagSystem.embade_functions.AbstractEmbed import AbstractEmbed
+from .AbstractEmbed import AbstractEmbed
 import os
 from chromadb.utils import embedding_functions
 

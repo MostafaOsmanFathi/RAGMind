@@ -1,9 +1,9 @@
 import chromadb
-import vectordb_utils
+from . import vectordb_utils
 import os
 
 class ChromadbManger:
-    def __init__(self, persistent_client_path,db_collection_name: str,embedding_fun=None,n_results_query:int=2):
+    def __init__(self, persistent_client_path,db_collection_name: str,n_results_query:int=2,embedding_fun=None):
         self.persistent_client_path = persistent_client_path
         self.db_collection_name = db_collection_name
         self.n_results_query = n_results_query

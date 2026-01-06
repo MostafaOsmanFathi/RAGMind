@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 
 class AbstractPrompts(ABC):
@@ -7,14 +8,18 @@ class AbstractPrompts(ABC):
 
 
     @abstractmethod
-    def _query_hypothetical_answers(self) -> str:
+    def query_hypothetical_answers(self,question) -> str:
         pass
 
 
     @abstractmethod
-    def _multiple_query_answers(self,expand_by=3) -> str:
+    def multiple_query(self,question,expand_by=3) -> str:
         pass
 
     @abstractmethod
-    def _answer_context(self,context: str) -> str:
+    def answer_context(self,question,context: str) -> str:
         pass
+
+    @staticmethod
+    def _parse_prompt(prompt: str, question:str) -> List[dict]:
+        return [{'role': 'system', 'content': prompt}, {'role': 'user', 'content': question}]

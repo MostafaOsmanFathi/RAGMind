@@ -1,4 +1,6 @@
-from RagSystem.prompts.AbstractPrompts import AbstractPrompts
+from typing import List
+
+from .AbstractPrompts import AbstractPrompts
 
 
 class DefaultPrompt(AbstractPrompts):
@@ -6,8 +8,8 @@ class DefaultPrompt(AbstractPrompts):
         super().__init__()
 
 
-    def _query_hypothetical_answers(self) -> str:
-        query_hypothetical_answers_prompt = f"""
+    def query_hypothetical_answers(self,question) -> List[dict]:
+        prompt = f"""
                 You ar_ an AI assistant tasked with generating multiple plausible ways topics or concepts could be described in documents. 
                 Do not provide a definitive answer. Instead, imagine **all possible contexts, variations, or phrasings** in which the information might appear.
 
@@ -18,10 +20,11 @@ class DefaultPrompt(AbstractPrompts):
                 2. Use synonyms, alternate phrasings, and related concepts when appropriate.
                 3. Return only the hypothetical answers as separate bullet points or lines, **grouped by question in order**.
                 """
-        return query_hypothetical_answers_prompt
 
-    def _multiple_query_answers(self,expand_by=3) -> str:
-        query_expansion_prompt = f"""
+        return self._parse_prompt(prompt,question)
+
+    def multiple_query(self,question,expand_by=3) -> List[dict]:
+        prompt = f"""
               You are an assistant that rewrites user queries to improve retrieval from a document collection. 
               Your task is to expand the query with context cues so that the search system retrieves the most relevant documents, including small or overlooked documents.
 
@@ -34,9 +37,10 @@ class DefaultPrompt(AbstractPrompts):
               6. You will make exactly {expand_by} extra queries.
 
               """
-        return query_expansion_prompt
+        return self._parse_prompt(prompt,question)
 
-    def _answer_context(context: str) -> str:
+
+    def answer_context(self,question:str,context: str) -> List[dict]:
         prompt = f"""
             You are an AI assistant with access to private documents. Answer user questions **using ONLY the content provided below**.
             Follow these rules:
@@ -48,4 +52,4 @@ class DefaultPrompt(AbstractPrompts):
             Context / Relevant document chunks:
             {context}    
             """
-        return prompt
+        return self._parse_prompt(prompt,question)

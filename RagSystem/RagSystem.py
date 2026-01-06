@@ -1,8 +1,9 @@
 import os
 import chromadb
+import ollama
 from chromadb.utils import embedding_functions
 import hashlib
-
+from ollama import chat
 
 class RagSystem:
     db_collection_root = 'chromadb_root'
@@ -12,6 +13,7 @@ class RagSystem:
 
         self.chroma_client = chromadb.PersistentClient(path=f'{RagSystem.db_collection_root}')
         self.collection = self.chroma_client.get_or_create_collection(self.db_collection_name)
+        self.llm_client=ollama.Client()
 
         self.n_results_query = n_results_query
 
@@ -78,7 +80,7 @@ class RagSystem:
     def _query_document(self, question: str):
         results = self.collection.query(
             query_texts=[question],
-            n_results=self.n_results_query,
+            n_results=3,
             include=['documents', 'metadatas']  # remove deprecated 'ids'
         )
 
@@ -87,6 +89,20 @@ class RagSystem:
         ]
 
         return relevant_chunks
+
+
+    def _query_llm_model(self,message:list[dict]):
+        response = chat(
+            model="mistral",
+            messages=message,
+            options={
+                "num_ctx": 2048,  # reduce KV cache cost
+                "num_predict": 128,  # limit output length
+                "batch_size": 128,  # CPU-friendly
+                "temperature": 0.7
+            }
+        )
+        return response["message"].get("content")
 
     def _prompt_llm(self, question: str, context: str) -> str:
         # System prompt: instructions to stay grounded in the retrieved documents
@@ -99,17 +115,13 @@ class RagSystem:
     4. You may reference the source or file name if useful.
 
     Context / Relevant document chunks:
-    {context}
-    
-    user ask about: {question}
+    {context}    
     """
-
-        #TODO connect it with LLM
-
-        return prompt
+        result=self._query_llm_model([{'role':'system','content':prompt},{'role':'user','content':question}])
+        return result
 
 
-    def _mutiple_query_expansion(self, question: str) -> str:
+    def _multiple_query_expansion(self, question: str,expand_by=3) -> str:
         query_expansion_prompt = f"""
         You are an assistant that rewrites user queries to improve retrieval from a document collection. 
         Your task is to expand the query with context cues so that the search system retrieves the most relevant documents, including small or overlooked documents.
@@ -120,42 +132,46 @@ class RagSystem:
         3. Include synonyms, related terms, or clarifying details that help match the right document.
         4. Keep the expanded query concise and relevant — no extra unrelated words.
         5. Output only the expanded query, nothing else.
-        6. Return the results in json format list of string each has the query.
+        6. You will make exactly {expand_by} extra queries.
         
         User query: "{question}"
         """
-        #TODO connect it with LLM
-        return question
+        result=self._query_llm_model([
+            {'role': 'system', 'content':query_expansion_prompt},
+            {'role': 'user', 'content':'answer on system query'}
+        ])
+        return result
 
 
     def _query_hypothetical_answers(self, question: str) -> str:
         query_hypothetical_answers_prompt = f"""
-        You are an AI assistant tasked with expanding a user's question into multiple plausible ways the answer could exist in documents. 
-        Do not answer the question directly. Instead, imagine **all possible variations, contexts, or phrasings** in which the answer could appear. 
-        Think creatively and logically about the content that might exist in documents.
+        You are an AI assistant tasked with generating multiple plausible ways topics or concepts could be described in documents. 
+        Do not provide a definitive answer. Instead, imagine **all possible contexts, variations, or phrasings** in which the information might appear.
+
+        You will be given **a list of questions or topics**. For each one, generate 2 hypothetical answers in the same order.
 
         Rules:
-        1. Generate 3-5 different hypothetical ways the answer could be expressed in a document.
-        2. Include synonyms, alternate phrasing, and related concepts.
-        3. Focus on expanding the question to maximize document retrieval relevance.
-        4. Return only the expanded versions as separate bullet points or lines.
-
-        Original question: "{question}"
+        1. For each topic or question, provide **exactly 2 different hypothetical answers** that could plausibly exist in documents.
+        2. Use synonyms, alternate phrasings, and related concepts when appropriate.
+        3. Return only the hypothetical answers as separate bullet points or lines, **grouped by question in order**.
         """
 
-        #TODO connect it with LLM
-        return query_hypothetical_answers_prompt
-
+        result=self._query_llm_model([{'role':'system','content':query_hypothetical_answers_prompt},{'role':'user','content':question}])
+        return result
 
     def ask_question(self, question: str) -> str:
         try:
-            relevant_chunks = self._query_document(question)
 
-            llm_response = self.prompt_llm(question, "\n".join(relevant_chunks))
+            multiple_queries=question+self._multiple_query_expansion(question)
+
+            answers=self._query_hypothetical_answers(multiple_queries)
+
+            search_with=multiple_queries+' \n'+answers
+
+            relevant_chunks = self._query_document(search_with)
+
+            llm_response = self._prompt_llm(question, "\n".join(relevant_chunks))
             return llm_response
+
         except Exception as e:
-            print(e)
-            return ""
-
-
-
+            raise e

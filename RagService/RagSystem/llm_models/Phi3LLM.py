@@ -1,4 +1,4 @@
-from RagSystem.llm_models.OllamaLLM import OllamaLLM
+from .OllamaLLM import OllamaLLM
 
 
 class Phi3LLM(OllamaLLM):

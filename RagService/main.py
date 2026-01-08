@@ -1,22 +1,27 @@
+import sys
+
 from dotenv import load_dotenv
-import os
+load_dotenv(verbose=False)
+from RagSystem.workers_listener import start_listener
 
-load_dotenv(verbose=True)
-OLLAMA_URL = os.getenv("OLLAMA_URL")
-
-from RagService.RagSystem import RagSystem
 
 def main():
-    print("DEBUG OLLAMA_URL =", os.getenv("OLLAMA_URL"))
-    reg = RagSystem('first_collection')
+    concurrent_raq_workers = 2
+    concurrent_doc_workers = 5
 
-    for doc in os.listdir('docs'):
-        if doc:
-            reg.add_document(f'docs/{str(doc)}')
+    try:
+        if len(sys.argv) > 2:
+            raise ValueError('incorrect number of arguments')
+        elif len(sys.argv) == 2:
+            concurrent_raq_workers = int(sys.argv[1])
+            concurrent_doc_workers = int(sys.argv[2])
+        elif len(sys.argv) == 1:
+            concurrent_raq_workers = int(sys.argv[1])
+    except Exception as e:
+            print("invalid args, args is  <number_of_raq_workers> <number_of_doc_workers>")
 
-    res = reg.ask_question("people centered approaches?")
-    print('=============')
-    print(res)
+    start_listener(concurrent_raq_workers,concurrent_doc_workers)
+
 
 if __name__ == '__main__':
     main()

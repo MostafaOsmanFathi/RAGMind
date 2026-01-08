@@ -59,9 +59,9 @@ def rag_listener(concurrent_tasks=2):
                     queue_callback_map=queue_callback_map,
                     prefetch_count=concurrent_tasks)
 
-def main():
-    t1 = threading.Thread(target=rag_listener, args=(2,))
-    t2 = threading.Thread(target=doc_listener, args=(5,))
+def start_listener(concurrent_raq_workers=2,concurrent_doc_workers=5):
+    t1 = threading.Thread(target=rag_listener, args=(concurrent_raq_workers,))
+    t2 = threading.Thread(target=doc_listener, args=(concurrent_doc_workers,))
 
     t1.start()
     t2.start()
@@ -70,4 +70,4 @@ def main():
     t2.join()
 
 if __name__ == '__main__':
-    main()
+    start_listener()

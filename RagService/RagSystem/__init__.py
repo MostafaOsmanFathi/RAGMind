@@ -15,4 +15,5 @@ __all__ = [
     "MistralLLM",
     "DefaultPrompt",
     "NomicEmbed",
+    "workers_listener"
 ]

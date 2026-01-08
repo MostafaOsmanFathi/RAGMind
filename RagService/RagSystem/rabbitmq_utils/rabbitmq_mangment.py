@@ -20,6 +20,7 @@ def get_connection(host=RABBITMQ_HOST, user=RABBITMQ_USER, password=RABBITMQ_PAS
         heartbeat=heartbeat,
         blocked_connection_timeout=blocked_timeout
     )
+
     return pika.BlockingConnection(params)
 
 

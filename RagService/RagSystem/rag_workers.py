@@ -48,7 +48,7 @@ def get_rag(message:RagInit):
 
 
 
-def process_rag_query(ch, method, properties, body):
+def worker_rag_query(ch, method, properties, body):
     try:
         message = RAGWorkerMessage.model_validate(body)
 
@@ -82,7 +82,7 @@ def process_rag_query(ch, method, properties, body):
 
 
 
-def add_doc_query(ch, method, properties, body):
+def worker_add_doc_query(ch, method, properties, body):
     try:
         message = DocumentWorkerMessage.model_validate(body)
 

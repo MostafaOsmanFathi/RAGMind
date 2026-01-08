@@ -1,0 +1,44 @@
+services:
+  rag-service:
+    build:
+      context: RagService/.
+      args:
+        CHROMADB_PATH: '/app/chromadb/data'
+        SHARED_STORAGE_File_PATH: '/app/shared/files'
+
+    networks:
+      - rag_tier
+
+    volumes:
+      - shared_volume:/app/shared/files
+      - chromadb_volume:/app/chromadb/data
+
+  ollama:
+    build: Ollama/.
+    networks:
+      - rag_tier
+    volumes:
+      - ollama_volume:/root/.ollama
+
+  rabbitmq:
+    build: Rabbitmq/.
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      rabbitmq_tier:
+    volumes:
+      - rabbitmq_volume:/var/lib/rabbitmq
+
+volumes:
+  chromadb_volume:
+  shared_volume:
+  ollama_volume:
+  rabbitmq_volume:
+
+
+
+networks:
+  rag_tier:
+    internal: true
+  rabbitmq_tier:

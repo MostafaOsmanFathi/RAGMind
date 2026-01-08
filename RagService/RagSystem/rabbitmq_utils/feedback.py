@@ -10,7 +10,7 @@ def send_doc_feedback(feedback: DocFeedback, host_url: str):
     # Declare exchange
     channel.exchange_declare(exchange=DOC_TOPIC_EXCHANGE_FEEDBACK, exchange_type=EXCHANGE_TYPE_TOPIC_FEEDBACK, durable=True)
 
-    routing_key = f"doc.{feedback.action}.{feedback.backend_id}.{DocFeedback.status}"  # e.g., doc.add.backend_1
+    routing_key = f"doc.{feedback.action}.{feedback.backend_id}.{feedback.status}"  # e.g., doc.add.backend_1
     channel.basic_publish(
         exchange=DOC_TOPIC_EXCHANGE_FEEDBACK,
         routing_key=routing_key,

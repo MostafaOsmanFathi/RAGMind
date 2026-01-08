@@ -42,7 +42,6 @@ def get_rag(message:RagInit):
         embedding_fun=embedding_fun,
         llm_model=llm_model,
         prompt_manger=DefaultPrompt(),
-        n_results_query=message.options.get("n_results", 6)
     )
     return rag
 
@@ -50,7 +49,7 @@ def get_rag(message:RagInit):
 
 def worker_rag_query(ch, method, properties, body):
     try:
-        message = RAGWorkerMessage.model_validate(body)
+        message = RAGWorkerMessage.model_validate_json(body)
 
         rag=get_rag(message)
 
@@ -74,7 +73,7 @@ def worker_rag_query(ch, method, properties, body):
 
     except Exception as e:
         print("RAG worker error:", e)
-        feedback = RAGFeedback.model_validate(body)
+        feedback = RAGFeedback.model_validate_json(body)
         feedback.status='failed'
         send_rag_feedback(feedback, host_url=RABBITMQ_HOST)
         # ACK confirm task failed
@@ -84,7 +83,7 @@ def worker_rag_query(ch, method, properties, body):
 
 def worker_add_doc_query(ch, method, properties, body):
     try:
-        message = DocumentWorkerMessage.model_validate(body)
+        message = DocumentWorkerMessage.model_validate_json(body)
 
         rag=get_rag(message)
 
@@ -95,18 +94,18 @@ def worker_add_doc_query(ch, method, properties, body):
             backend_id=message.backend_id,
             user_id=message.user_id,
             collection_name=message.collection_name,
-            llm_model=message.llm_model
+            llm_model=message.llm_model,
+            action=message.action
         )
 
         feedback.status = 'success'
-
         send_doc_feedback(feedback, host_url=RABBITMQ_HOST)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     except Exception as e:
         print("RAG worker error:", e)
-        feedback = DocFeedback.model_validate(body)
+        feedback = DocFeedback.model_validate_json(body)
         feedback.status = 'failed'
         send_doc_feedback(feedback, host_url=RABBITMQ_HOST)
         ch.basic_ack(delivery_tag=method.delivery_tag)

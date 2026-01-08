@@ -2,21 +2,26 @@ services:
   rag-service:
     build:
       context: RagService/.
-      args:
-        CHROMADB_PATH: '/app/chromadb/data'
-        SHARED_STORAGE_File_PATH: '/app/shared/files'
+    environment:
+      CHROMADB_PATH: '/app/chromadb/data'
+      SHARED_STORAGE_FILE_PATH: '/app/shared/files'
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+      OLLAMA_URL: http://ollama:11434/
+      RABBITMQ_HOST: rabbitmq
 
     networks:
-      - rag_tier
-
+      - temp_network
     volumes:
       - shared_volume:/app/shared/files
       - chromadb_volume:/app/chromadb/data
+    depends_on:
+      - rabbitmq
 
   ollama:
     build: Ollama/.
     networks:
-      - rag_tier
+      - temp_network
     volumes:
       - ollama_volume:/root/.ollama
 
@@ -26,7 +31,7 @@ services:
       - "5672:5672"
       - "15672:15672"
     networks:
-      rabbitmq_tier:
+      - temp_network
     volumes:
       - rabbitmq_volume:/var/lib/rabbitmq
 
@@ -39,6 +44,4 @@ volumes:
 
 
 networks:
-  rag_tier:
-    internal: true
-  rabbitmq_tier:
+  temp_network:

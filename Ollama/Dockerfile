@@ -1,4 +1,4 @@
-FROM ollama/ollama:rocm
+FROM ollama/ollama:latest
 
 COPY entrypoint.sh /entrypoint.sh
 

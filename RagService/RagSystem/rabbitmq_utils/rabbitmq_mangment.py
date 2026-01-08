@@ -1,4 +1,8 @@
+import time
+
 import pika
+from pika.exceptions import AMQPConnectionError
+
 from .exchanges import (
     DOC_TOPIC_EXCHANGE_WORKER,
     RAG_TOPIC_EXCHANGE_WORKER,
@@ -11,17 +15,26 @@ from .exchanges import (
 )
 
 
-def get_connection(host=RABBITMQ_HOST, user=RABBITMQ_USER, password=RABBITMQ_PASSWORD, heartbeat=600, blocked_timeout=300):
-    """Create a RabbitMQ connection."""
-    credentials = pika.PlainCredentials(user, password)
-    params = pika.ConnectionParameters(
-        host=host,
-        credentials=credentials,
-        heartbeat=heartbeat,
-        blocked_connection_timeout=blocked_timeout
-    )
+def get_connection(host=RABBITMQ_HOST, user=RABBITMQ_USER, password=RABBITMQ_PASSWORD, heartbeat=600, blocked_timeout=300,max_retries=5,delay=5):
+    attempt = 0
+    while attempt < max_retries:
+        try:
+            credentials = pika.PlainCredentials(user, password)
+            params = pika.ConnectionParameters(
+                host=host,
+                credentials=credentials,
+                heartbeat=heartbeat,
+                blocked_connection_timeout=blocked_timeout
+            )
+            connection = pika.BlockingConnection(params)
+            print(f"[INFO] Connected to RabbitMQ at {host}")
+            return connection
+        except AMQPConnectionError as e:
+            attempt += 1
+            print(f"[WARN] Failed to connect to {host} (attempt {attempt}/{max_retries}): {e}")
+            time.sleep(delay)
 
-    return pika.BlockingConnection(params)
+    raise AMQPConnectionError(f"Could not connect to RabbitMQ at {host} after {max_retries} attempts")
 
 
 def create_channel(connection):

@@ -19,7 +19,7 @@ class RagSystem:
 
 
     def add_document(self,document_path:str):
-        self.vectordb.add_document(document_path)
+        return self.vectordb.add_document(document_path)
 
 
     def ask_question(self, question: str) -> str:

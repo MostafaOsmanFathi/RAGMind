@@ -1,10 +1,12 @@
 FROM ollama/ollama:rocm
 
-COPY install.sh .
-RUN chmode +x install.sh && bash install.sh
+COPY entrypoint.sh /entrypoint.sh
 
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 11434
 
-ENTRYPOINT [ "/bin/ollama" ]
-CMD [ "serve" ]
+VOLUME ["/root/.ollama"]
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["nomic-embed-text", "mistral", "phi3"]

@@ -1,6 +1,4 @@
-import json
 from hashlib import md5
-from pydantic import ValidationError
 
 from .RagSystem import RagSystem
 from .embade_functions.NomicEmbed import NomicEmbed
@@ -66,7 +64,9 @@ def process_rag_query(ch, method, properties, body):
             response=response,
             llm_model=message.llm_model
         )
+
         feedback.status='success'
+
         send_rag_feedback(feedback, host_url=RABBITMQ_HOST)
 
         # ACK confirm task success

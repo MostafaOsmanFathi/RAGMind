@@ -35,11 +35,27 @@ services:
     volumes:
       - rabbitmq_volume:/var/lib/rabbitmq
 
+
+  pg_database:
+    build: Database/.
+
+    environment:
+      POSTGRES_DB: spring_database
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password
+
+    volumes:
+      - pg_volume:/var/lib/postgresql/data
+    networks:
+      - temp_network
+    
+
 volumes:
   chromadb_volume:
   shared_volume:
   ollama_volume:
   rabbitmq_volume:
+  pg_volume:
 
 
 

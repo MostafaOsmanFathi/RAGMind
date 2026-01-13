@@ -37,12 +37,12 @@ services:
 
 
   pg_database:
-    build: Database/.
-
-    environment:
-      POSTGRES_DB: spring_database
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin_password
+    build:
+      context: Database/.
+      args:
+        POSTGRES_DB: ragdb
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: admin_password
 
     volumes:
       - pg_volume:/var/lib/postgresql/data

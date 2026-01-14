@@ -19,8 +19,12 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<Collection> userCollections;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    List<Notification> notifications;
+
 
     public String getName() {
         return name;

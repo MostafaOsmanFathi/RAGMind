@@ -11,6 +11,9 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_notification")
+    private User user;
 
     @Column(name = "notification_message")
     private String notificationMessage;

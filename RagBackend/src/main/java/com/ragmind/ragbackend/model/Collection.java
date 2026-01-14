@@ -2,6 +2,8 @@ package com.ragmind.ragbackend.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "collection")
 public class Collection {
@@ -13,6 +15,13 @@ public class Collection {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+
+    @OneToMany(mappedBy = "collection",cascade = CascadeType.ALL)
+    private List<CollectionChat> chatHistory;
+
+    @OneToMany(mappedBy = "collection",cascade = CascadeType.ALL)
+    private List<CollectionDocuments> collectionDocuments;
 
     @Column(name = "number_of_docs")
     private Integer numberOfDocs;

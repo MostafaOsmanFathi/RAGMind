@@ -1,6 +1,6 @@
 package com.ragmind.ragbackend.controller;
 
-import com.ragmind.ragbackend.model.CollectionDocuments;
+import com.ragmind.ragbackend.entity.CollectionDocuments;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

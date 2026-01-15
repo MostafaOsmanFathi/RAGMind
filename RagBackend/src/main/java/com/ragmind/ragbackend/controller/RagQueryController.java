@@ -1,13 +1,13 @@
 package com.ragmind.ragbackend.controller;
 
-import com.ragmind.ragbackend.model.CollectionChat;
+import com.ragmind.ragbackend.entity.CollectionChat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/rag/collections/{collectionId}/queries")
-class RagQuireController {
+class RagQueryController {
 
 
     @PostMapping("/ask")

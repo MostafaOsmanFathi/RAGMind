@@ -15,14 +15,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = request.getHeader("Authorization");
-        if (token == null || !token.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Missing or invalid token");
-            return;
-        }
-
-        //TODO JWT Validation
+//        String token = request.getHeader("Authorization");
+//        if (token == null || !token.startsWith("Bearer ")) {
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.getWriter().write("Missing or invalid token");
+//            return;
+//        }
+//
+//        //TODO JWT Validation
 
         filterChain.doFilter(request, response);
     }

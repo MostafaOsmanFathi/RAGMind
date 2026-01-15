@@ -1,6 +1,6 @@
 package com.ragmind.ragbackend.controller;
 
-import com.ragmind.ragbackend.model.Collection;
+import com.ragmind.ragbackend.entity.Collection;
 import org.hibernate.sql.ast.tree.expression.Collation;
 import org.springframework.web.bind.annotation.*;
 

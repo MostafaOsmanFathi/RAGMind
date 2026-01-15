@@ -1,7 +1,7 @@
 package com.ragmind.ragbackend.repository;
 
-import com.ragmind.ragbackend.model.Collection;
-import com.ragmind.ragbackend.model.CollectionChat;
+import com.ragmind.ragbackend.entity.Collection;
+import com.ragmind.ragbackend.entity.CollectionChat;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

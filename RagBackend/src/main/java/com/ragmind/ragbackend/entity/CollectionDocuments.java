@@ -1,4 +1,4 @@
-package com.ragmind.ragbackend.model;
+package com.ragmind.ragbackend.entity;
 
 import jakarta.persistence.*;
 import java.util.Date;

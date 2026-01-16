@@ -2,10 +2,10 @@ package com.ragmind.ragbackend.controller;
 
 import com.ragmind.ragbackend.dto.request.UserLoginRequest;
 import com.ragmind.ragbackend.dto.request.UserSignupRequest;
-import com.ragmind.ragbackend.dto.response.UserResponse;
+import com.ragmind.ragbackend.dto.response.LoginResponse;
+import com.ragmind.ragbackend.dto.response.SignupResponse;
 import com.ragmind.ragbackend.entity.User;
 import com.ragmind.ragbackend.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,15 +23,15 @@ class AuthController {
     }
 
     @PostMapping("/login")
-    ResponseEntity<UserResponse> login(
+    ResponseEntity<LoginResponse> login(
             @RequestBody UserLoginRequest request) {
 
-        User user = userService.login(request);
-        return ResponseEntity.ok(userService.toResponse(user));
+        LoginResponse loginResponse = userService.login(request);
+        return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/signup")
-    ResponseEntity<UserResponse> signup(@RequestBody UserSignupRequest request) {
+    ResponseEntity<SignupResponse> signup(@RequestBody UserSignupRequest request) {
 
         User user = userService.createUser(request);
 

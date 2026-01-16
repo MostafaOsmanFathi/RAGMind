@@ -13,10 +13,13 @@ public class User {
     private Long id;
 
     private String name;
+
     @Column(unique = true)
     private String email;
 
     private String password;
+
+    private String refreshToken;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -84,4 +87,13 @@ public class User {
     public void setNotifications(List<Notification> notifications) {
         this.notifications = notifications;
     }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
 }

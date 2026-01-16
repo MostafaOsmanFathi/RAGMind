@@ -1,7 +1,9 @@
 package com.ragmind.ragbackend.controller;
 
+import com.ragmind.ragbackend.dto.request.GenerateAccessTokenRequest;
 import com.ragmind.ragbackend.dto.request.UserLoginRequest;
 import com.ragmind.ragbackend.dto.request.UserSignupRequest;
+import com.ragmind.ragbackend.dto.response.GenerateAccessTokenResponse;
 import com.ragmind.ragbackend.dto.response.LoginResponse;
 import com.ragmind.ragbackend.dto.response.SignupResponse;
 import com.ragmind.ragbackend.entity.User;
@@ -41,8 +43,8 @@ class AuthController {
     }
 
     @PostMapping("/refreshtoken")
-    void refreshToken(){
-
+    GenerateAccessTokenResponse refreshToken(@RequestBody GenerateAccessTokenRequest generateAccessTokenRequest) {
+        return userService.generateAccessToken(generateAccessTokenRequest);
     }
 
 }

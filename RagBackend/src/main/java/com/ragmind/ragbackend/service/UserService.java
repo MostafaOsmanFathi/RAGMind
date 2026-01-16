@@ -1,7 +1,9 @@
 package com.ragmind.ragbackend.service;
 
+import com.ragmind.ragbackend.dto.request.GenerateAccessTokenRequest;
 import com.ragmind.ragbackend.dto.request.UserLoginRequest;
 import com.ragmind.ragbackend.dto.request.UserSignupRequest;
+import com.ragmind.ragbackend.dto.response.GenerateAccessTokenResponse;
 import com.ragmind.ragbackend.dto.response.LoginResponse;
 import com.ragmind.ragbackend.dto.response.SignupResponse;
 import com.ragmind.ragbackend.entity.User;
@@ -72,5 +74,14 @@ public class UserService {
         return loginResponse;
     }
 
-
+    public GenerateAccessTokenResponse generateAccessToken(GenerateAccessTokenRequest request) {
+        if (!jwtService.isTokenValid(request.getRefreshToken())) {
+            return null;
+        }
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new ValidationException("Token Email doesn't exists"));
+        String accessToken = jwtService.generateAccessToken(new HashMap<>(), user);
+        GenerateAccessTokenResponse response = new GenerateAccessTokenResponse();
+        response.setAccessToken(accessToken);
+        return response;
+    }
 }

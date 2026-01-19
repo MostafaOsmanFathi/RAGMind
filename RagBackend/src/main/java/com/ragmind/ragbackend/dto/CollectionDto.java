@@ -1,4 +1,10 @@
 package com.ragmind.ragbackend.dto;
 
-public class CollectionDto {
+
+public record CollectionDto(
+        Long id,
+        String collectionName,
+        Integer numberOfDocs
+) {
+
 }

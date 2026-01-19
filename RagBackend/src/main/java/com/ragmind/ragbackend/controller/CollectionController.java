@@ -10,7 +10,7 @@ import java.util.List;
 @RequestMapping("/rag/collection")
 class CollectionController {
 
-    @GetMapping("/")
+    @GetMapping({"/", ""})
     List<Collation> getAllUserCollections() {
         return null;
     }
@@ -20,7 +20,7 @@ class CollectionController {
         return null;
     }
 
-    @PostMapping("/")
+    @PostMapping({"/",""})
     void addCollection(Collection collection) {
 
     }

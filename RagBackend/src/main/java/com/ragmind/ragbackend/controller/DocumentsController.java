@@ -9,7 +9,7 @@ import java.util.List;
 @RequestMapping("rag/collection/{collectionId}/documents")
 class DocumentsController {
 
-    @GetMapping("/")
+    @GetMapping({"/", ""})
     List<CollectionDocuments> getAllDocuments(@PathVariable String collectionId) {
         return null;
     }
@@ -19,8 +19,8 @@ class DocumentsController {
         return null;
     }
 
-    @PostMapping("/")
-    void addDocument(@PathVariable String collectionId){
+    @PostMapping({"/", ""})
+    void addDocument(@PathVariable String collectionId) {
 
     }
 

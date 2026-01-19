@@ -7,7 +7,9 @@ import com.ragmind.ragbackend.dto.response.GenerateAccessTokenResponse;
 import com.ragmind.ragbackend.dto.response.LoginResponse;
 import com.ragmind.ragbackend.dto.response.SignupResponse;
 import com.ragmind.ragbackend.entity.User;
+import com.ragmind.ragbackend.service.JwtService;
 import com.ragmind.ragbackend.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,13 +19,14 @@ import org.springframework.web.bind.annotation.*;
 class AuthController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
-    public AuthController(UserService userService) {
+    AuthController(UserService userService, JwtService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/login")
-    @ExceptionHandler(Exception.class)
     ResponseEntity<?> login(@RequestBody UserLoginRequest request) {
         try {
             LoginResponse loginResponse = userService.login(request);
@@ -41,7 +44,6 @@ class AuthController {
     }
 
     @PostMapping("/signup")
-    @ExceptionHandler(Exception.class)
     ResponseEntity<?> signup(@RequestBody UserSignupRequest request) {
         try {
             User user = userService.createUser(request);
@@ -57,9 +59,15 @@ class AuthController {
     }
 
     @PostMapping("/refreshtoken")
-    @ExceptionHandler(Exception.class)
-    ResponseEntity<?> refreshToken(@RequestBody GenerateAccessTokenRequest generateAccessTokenRequest) {
+    ResponseEntity<?> refreshToken(HttpServletRequest request) {
         try {
+            String token = request.getHeader("Authorization").substring(7);
+            GenerateAccessTokenRequest generateAccessTokenRequest = new GenerateAccessTokenRequest();
+            String email = jwtService.extractEmail(token);
+
+            generateAccessTokenRequest.setRefreshToken(token);
+            generateAccessTokenRequest.setEmail(email);
+
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(userService.generateAccessToken(generateAccessTokenRequest));
         } catch (Exception e) {

@@ -24,6 +24,12 @@ public class JwtRefreshTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        return !path.equals("/auth/refreshtoken");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
@@ -50,7 +56,6 @@ public class JwtRefreshTokenFilter extends OncePerRequestFilter {
             }
 
             try {
-
 
                 String userEmail = jwtService.extractEmail(token);
                 UsernamePasswordAuthenticationToken authToken =

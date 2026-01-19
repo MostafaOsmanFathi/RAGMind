@@ -8,11 +8,9 @@ import com.ragmind.ragbackend.dto.response.LoginResponse;
 import com.ragmind.ragbackend.dto.response.SignupResponse;
 import com.ragmind.ragbackend.entity.User;
 import com.ragmind.ragbackend.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -25,26 +23,52 @@ class AuthController {
     }
 
     @PostMapping("/login")
-    ResponseEntity<LoginResponse> login(
-            @RequestBody UserLoginRequest request) {
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<?> login(@RequestBody UserLoginRequest request) {
+        try {
+            LoginResponse loginResponse = userService.login(request);
+            return ResponseEntity.ok(loginResponse);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
 
-        LoginResponse loginResponse = userService.login(request);
-        return ResponseEntity.ok(loginResponse);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("Invalid email or password"));
+        }
     }
 
     @PostMapping("/signup")
-    ResponseEntity<SignupResponse> signup(@RequestBody UserSignupRequest request) {
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<?> signup(@RequestBody UserSignupRequest request) {
+        try {
+            User user = userService.createUser(request);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(userService.toResponse(user));
 
-        User user = userService.createUser(request);
-
-        return ResponseEntity
-                .status(201)
-                .body(userService.toResponse(user));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
     }
 
     @PostMapping("/refreshtoken")
-    GenerateAccessTokenResponse refreshToken(@RequestBody GenerateAccessTokenRequest generateAccessTokenRequest) {
-        return userService.generateAccessToken(generateAccessTokenRequest);
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<?> refreshToken(@RequestBody GenerateAccessTokenRequest generateAccessTokenRequest) {
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(userService.generateAccessToken(generateAccessTokenRequest));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
     }
+}
 
+record ErrorResponse(String message) {
 }

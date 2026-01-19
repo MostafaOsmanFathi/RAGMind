@@ -14,6 +14,8 @@ public class User {
 
     private String name;
 
+    private boolean userEnabled;
+
     @Column(unique = true)
     private String email;
 
@@ -96,4 +98,11 @@ public class User {
         this.refreshToken = refreshToken;
     }
 
+    public boolean isUserEnabled() {
+        return userEnabled;
+    }
+
+    public void setUserEnabled(boolean userEnabled) {
+        this.userEnabled = userEnabled;
+    }
 }

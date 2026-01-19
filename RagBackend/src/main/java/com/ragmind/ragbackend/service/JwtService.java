@@ -18,13 +18,13 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${jwt.secret}")
-    private static String secretKey;
+    private String secretKey;
 
     @Value("${jwt.access-token-validity}")
-    private static long accessTokenValidity;
+    private long accessTokenValidity;
 
     @Value("${jwt.refresh-token-validity}")
-    private static long refreshTokenValidity;
+    private long refreshTokenValidity;
 
 
     private String generateToken(Map<String, Object> extraClaims, User user, String tokenType, long tokenValidity) {

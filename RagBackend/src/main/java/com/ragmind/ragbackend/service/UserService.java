@@ -31,7 +31,7 @@ public class UserService {
 
     public User createUser(UserSignupRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new ValidationException("This Email Already Exists");
+            throw new IllegalArgumentException("This Email Already Exists");
         }
 
         User user = new User();
@@ -42,6 +42,7 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(encodedPassword);
         user.setPhoneNumber(request.getPhoneNumber());
+        user.setUserEnabled(true);
 
         return userRepository.save(user);
     }
@@ -71,14 +72,25 @@ public class UserService {
         loginResponse.setAccessToken(accessToken);
         loginResponse.setRefreshToken(refreshToken);
         loginResponse.setEmail(user.getEmail());
+
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
         return loginResponse;
     }
 
-    public GenerateAccessTokenResponse generateAccessToken(GenerateAccessTokenRequest request) {
+    public GenerateAccessTokenResponse generateAccessToken(GenerateAccessTokenRequest request) throws Exception {
         if (!jwtService.isTokenValid(request.getRefreshToken())) {
-            return null;
+            throw new Exception("Refresh Token is not valid or expired");
         }
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new ValidationException("Token Email doesn't exists"));
+        if (!user.isUserEnabled()) {
+            throw new Exception("user not enabled");
+        }
+        if (!user.getRefreshToken().equals(request.getRefreshToken())) {
+            throw new Exception("Refresh Token Expired login again");
+        }
+        
         String accessToken = jwtService.generateAccessToken(new HashMap<>(), user);
         GenerateAccessTokenResponse response = new GenerateAccessTokenResponse();
         response.setAccessToken(accessToken);

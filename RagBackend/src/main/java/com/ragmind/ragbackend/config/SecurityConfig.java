@@ -1,6 +1,7 @@
 package com.ragmind.ragbackend.config;
 
 import com.ragmind.ragbackend.security.JwtAuthFilter;
+import com.ragmind.ragbackend.security.JwtRefreshTokenFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -18,9 +19,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    private final JwtRefreshTokenFilter jwtRefreshTokenFilter;
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, JwtRefreshTokenFilter jwtRefreshTokenFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.jwtRefreshTokenFilter = jwtRefreshTokenFilter;
     }
 
     @Bean
@@ -36,13 +38,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/login",
-                                "/auth/signup",
-                                "/auth/refresh-token"
+                                "/auth/signup"
                         ).permitAll()
-                        .requestMatchers("/rag/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtRefreshTokenFilter, JwtAuthFilter.class)
+        ;
 
         return http.build();
     }

@@ -1,5 +1,6 @@
 package com.ragmind.ragbackend.controller;
 
+import com.ragmind.ragbackend.dto.request.CreateCollectionRequestDto;
 import com.ragmind.ragbackend.entity.Collection;
 import com.ragmind.ragbackend.service.CollectionService;
 import org.hibernate.sql.ast.tree.expression.Collation;
@@ -44,13 +45,13 @@ class CollectionController {
     }
 
     @PostMapping({"/", ""})
-    void addCollection(Collection collection) {
-
+    void addCollection(CreateCollectionRequestDto collectionRequestDto, Authentication authentication) {
+        collectionService.addCollection(collectionRequestDto, authentication.getName());
     }
 
     @DeleteMapping("/{collectionId}")
-    void deleteCollection(@PathVariable String collectionId) {
-
+    void deleteCollection(@PathVariable String collectionId, Authentication authentication) {
+        collectionService.deleteCollection(Long.valueOf(collectionId));
     }
 
 

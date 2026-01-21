@@ -24,19 +24,43 @@ public class CollectionDocuments {
     @Column(name = "added_date")
     private Date addedDate;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Collection getCollection() {
         return collection;
+    }
+
+    public void setCollection(Collection collection) {
+        this.collection = collection;
     }
 
     public String getDocName() {
         return docName;
     }
 
+    public void setDocName(String docName) {
+        this.docName = docName;
+    }
+
     public String getSharedPath() {
         return sharedPath;
     }
 
+    public void setSharedPath(String sharedPath) {
+        this.sharedPath = sharedPath;
+    }
+
     public Date getAddedDate() {
         return addedDate;
+    }
+
+    public void setAddedDate(Date addedDate) {
+        this.addedDate = addedDate;
     }
 }

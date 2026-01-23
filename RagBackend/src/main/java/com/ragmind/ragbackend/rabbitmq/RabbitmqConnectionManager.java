@@ -14,6 +14,12 @@ class RabbitmqConnectionManager {
     @Value("${rabbitmq.host.url}")
     private String rabbitmqHost;
 
+    @Value("${rabbitmq.host.username}")
+    private String rabbitmqUsername;
+
+    @Value("${rabbitmq.host.password}")
+    private String rabbitmqPassword;
+
     private Connection connection;
 
     @PostConstruct
@@ -21,6 +27,8 @@ class RabbitmqConnectionManager {
         try {
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost(rabbitmqHost);
+            factory.setUsername(rabbitmqUsername);
+            factory.setPassword(rabbitmqPassword);
             this.connection = factory.newConnection();
         } catch (Exception e) {
             throw new RuntimeException("Failed to create RabbitMQ connection", e);

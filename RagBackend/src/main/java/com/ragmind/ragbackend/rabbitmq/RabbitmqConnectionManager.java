@@ -20,18 +20,40 @@ class RabbitmqConnectionManager {
     @Value("${rabbitmq.host.password}")
     private String rabbitmqPassword;
 
+    @Value("${rabbitmq.host.port}")
+    private Integer rabbitmqPort;
+
     private Connection connection;
 
     @PostConstruct
     void init() {
-        try {
-            ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost(rabbitmqHost);
-            factory.setUsername(rabbitmqUsername);
-            factory.setPassword(rabbitmqPassword);
-            this.connection = factory.newConnection();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create RabbitMQ connection", e);
+        int trials = 10;
+        int delayMs = 3000; // 3 seconds between retries
+
+        while (trials > 0) {
+            try {
+                ConnectionFactory factory = new ConnectionFactory();
+                factory.setHost(rabbitmqHost);
+                factory.setPort(rabbitmqPort);
+                factory.setUsername(rabbitmqUsername);
+                factory.setPassword(rabbitmqPassword);
+
+                this.connection = factory.newConnection();
+                System.out.println("Connected to RabbitMQ!");
+                break; // success, exit loop
+            } catch (Exception e) {
+                trials--;
+                System.out.println("RabbitMQ not ready yet, retrying in " + (delayMs/1000) + " seconds... (" + trials + " retries left)");
+                if (trials == 0) {
+                    throw new RuntimeException("Failed to create RabbitMQ connection after retries", e);
+                }
+                try {
+                    Thread.sleep(delayMs);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Retry interrupted", ie);
+                }
+            }
         }
     }
 
@@ -47,6 +69,7 @@ class RabbitmqConnectionManager {
     void shutdown() {
         try {
             if (connection != null) connection.close();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 }

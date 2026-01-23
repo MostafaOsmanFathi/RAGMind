@@ -42,8 +42,9 @@ services:
     networks:
       - temp_network
     volumes:
-      - shared_volume
-
+      - shared_volume:/app/shared/files
+    depends_on:
+      - rabbitmq
   pg_database:
     build:
       context: Database/.

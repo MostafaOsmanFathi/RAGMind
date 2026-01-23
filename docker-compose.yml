@@ -35,6 +35,14 @@ services:
     volumes:
       - rabbitmq_volume:/var/lib/rabbitmq
 
+  rag-backend:
+    build: RagBackend/.
+    ports:
+      - "8000:8000"
+    networks:
+      - temp_network
+    volumes:
+      - shared_volume
 
   pg_database:
     build:

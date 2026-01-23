@@ -38,7 +38,7 @@ services:
   rag-backend:
     build: RagBackend/.
     ports:
-      - "8000:8000"
+      - "8080:8080"
     networks:
       - temp_network
     volumes:

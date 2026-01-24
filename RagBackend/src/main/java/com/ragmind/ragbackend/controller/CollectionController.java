@@ -3,6 +3,7 @@ package com.ragmind.ragbackend.controller;
 import com.ragmind.ragbackend.dto.request.CreateCollectionRequestDto;
 import com.ragmind.ragbackend.entity.Collection;
 import com.ragmind.ragbackend.service.CollectionService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.hibernate.sql.ast.tree.expression.Collation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import com.ragmind.ragbackend.dto.CollectionDto;
 
 import java.util.List;
 
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/rag/collection")
 class CollectionController {

@@ -2,6 +2,7 @@ package com.ragmind.ragbackend.controller;
 
 import com.ragmind.ragbackend.dto.request.AddCollectionDocumentRequest;
 import com.ragmind.ragbackend.service.CollectionService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/rag/collection/{collectionId}/documents")
 class DocumentsController {

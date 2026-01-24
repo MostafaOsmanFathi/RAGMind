@@ -4,12 +4,14 @@ import com.ragmind.ragbackend.dto.rabbitmq.AskRabbitmqRequestDto;
 import com.ragmind.ragbackend.dto.rabbitmq.DocumentRabbitmqRequestDto;
 import com.ragmind.ragbackend.entity.CollectionChat;
 import com.ragmind.ragbackend.service.RabbitmqService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/rag/collections/{collectionId}/queries")
 class RagQueryController {

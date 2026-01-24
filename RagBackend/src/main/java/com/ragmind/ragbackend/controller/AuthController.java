@@ -9,6 +9,7 @@ import com.ragmind.ragbackend.dto.response.SignupResponse;
 import com.ragmind.ragbackend.entity.User;
 import com.ragmind.ragbackend.service.JwtService;
 import com.ragmind.ragbackend.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +60,7 @@ class AuthController {
     }
 
     @PostMapping("/refreshtoken")
+    @SecurityRequirement(name = "bearerAuth")
     ResponseEntity<?> refreshToken(HttpServletRequest request) {
         try {
             String token = request.getHeader("Authorization").substring(7);

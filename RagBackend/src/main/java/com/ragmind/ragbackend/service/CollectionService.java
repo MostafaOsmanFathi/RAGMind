@@ -2,6 +2,7 @@ package com.ragmind.ragbackend.service;
 
 import com.ragmind.ragbackend.dto.CollectionDocumentDto;
 import com.ragmind.ragbackend.dto.CollectionDto;
+import com.ragmind.ragbackend.dto.rabbitmq.DocumentRabbitmqRequestDto;
 import com.ragmind.ragbackend.dto.request.AddCollectionDocumentRequest;
 import com.ragmind.ragbackend.dto.request.CreateCollectionRequestDto;
 import com.ragmind.ragbackend.dto.request.CreateDocumentRequestDto;
@@ -13,7 +14,9 @@ import com.ragmind.ragbackend.repository.CollectionDocumentRepository;
 import com.ragmind.ragbackend.repository.CollectionRepository;
 import com.ragmind.ragbackend.repository.UserRepository;
 import jakarta.validation.ValidationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,12 +29,14 @@ public class CollectionService {
     private final UserRepository userRepository;
     private final CollectionDocumentRepository documentRepository;
     private final CollectionChatRepository collectionChatRepository;
+    private final RabbitmqService rabbitmqService;
 
-    CollectionService(CollectionRepository collectionRepository, UserRepository userRepository, CollectionDocumentRepository collectionDocumentRepository, CollectionChatRepository collectionChatRepository) {
+    CollectionService(CollectionRepository collectionRepository, UserRepository userRepository, CollectionDocumentRepository collectionDocumentRepository, CollectionChatRepository collectionChatRepository, RabbitmqService rabbitmqService) {
         this.collectionRepository = collectionRepository;
         this.userRepository = userRepository;
         this.documentRepository = collectionDocumentRepository;
         this.collectionChatRepository = collectionChatRepository;
+        this.rabbitmqService = rabbitmqService;
     }
 
 
@@ -88,14 +93,14 @@ public class CollectionService {
         return toDto(document);
     }
 
-    public void addDocument(Long collectionId, AddCollectionDocumentRequest request,String documentPath) {
+    public void addDocument(Long collectionId, String documentPath, String docName,String collectionName,Authentication authentication) {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new IllegalArgumentException("Collection not found"));
 
         CollectionDocuments document = new CollectionDocuments();
         document.setCollection(collection);
-        document.setDocName(request.docName());
-        document.setSharedPath(request.sharedPath());
+        document.setDocName(docName);
+        document.setSharedPath(documentPath);
         document.setAddedDate(new Date());
 
         documentRepository.save(document);
@@ -106,7 +111,17 @@ public class CollectionService {
                         : collection.getNumberOfDocs() + 1
         );
 
-        //TODO Enqueue Document Task in RabbitMQ Exchanger
+        DocumentRabbitmqRequestDto rabbitmqRequestDto = new DocumentRabbitmqRequestDto();
+        rabbitmqRequestDto.setAction("add");
+        rabbitmqRequestDto.setFilePath(documentPath);
+        rabbitmqRequestDto.setUserId(authentication.getName());
+        rabbitmqRequestDto.setCollectionName(collectionName);
+        rabbitmqRequestDto.setEmbedModel("nomic-embed-text");
+        rabbitmqRequestDto.setLlmModel("mistral");
+
+        //TODO make llm models and embedder configurable
+
+        rabbitmqService.sendDocumentTask(rabbitmqRequestDto);
     }
 
     private CollectionDocumentDto toDto(CollectionDocuments document) {

@@ -60,7 +60,6 @@ class DocumentsController {
     @PostMapping({"", "/"})
     ResponseEntity<?> addDocument(
             @PathVariable Long collectionId,
-            @ModelAttribute AddCollectionDocumentRequest request,
             @RequestParam("file") MultipartFile file,
             Authentication authentication
     ) {
@@ -71,7 +70,7 @@ class DocumentsController {
             }
             Path filePath = dirPath.resolve(Objects.requireNonNull(file.getOriginalFilename()));
             file.transferTo(filePath.toFile());
-            collectionService.addDocument(collectionId, request, filePath.toString());
+            collectionService.addDocument(collectionId,filePath.toString(),file.getOriginalFilename(),collectionId.toString(),authentication);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

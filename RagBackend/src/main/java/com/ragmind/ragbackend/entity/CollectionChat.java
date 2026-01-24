@@ -15,7 +15,9 @@ public class CollectionChat {
     @JoinColumn(name = "collection_id", nullable = false)
     private Collection collection;
 
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String message;
+
     private String role;
     private LocalDate date;
 

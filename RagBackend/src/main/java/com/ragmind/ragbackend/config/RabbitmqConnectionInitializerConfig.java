@@ -1,4 +1,4 @@
-package com.ragmind.ragbackend.rabbitmq;
+package com.ragmind.ragbackend.config;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -6,10 +6,10 @@ import com.rabbitmq.client.ConnectionFactory;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
-@Component
-class RabbitmqConnectionManager {
+@Configuration
+public class RabbitmqConnectionInitializerConfig {
 
     @Value("${rabbitmq.host.url}")
     private String rabbitmqHost;
@@ -57,7 +57,7 @@ class RabbitmqConnectionManager {
         }
     }
 
-    Channel createChannel() {
+    public Channel createChannel() {
         try {
             return connection.createChannel();
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package com.ragmind.ragbackend.rabbitmq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
+import com.ragmind.ragbackend.config.RabbitmqConnectionInitializerConfig;
 import com.ragmind.ragbackend.dto.rabbitmq.DocumentRabbitmqRequestDto;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -13,12 +14,12 @@ public class DocumentRabbitmqProducer {
     private static final String EXCHANGE_NAME = "doc_topic_worker";
     private static final String EXCHANGE_TYPE = "topic";
 
-    private final RabbitmqConnectionManager connectionManager;
+    private final RabbitmqConnectionInitializerConfig connectionManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private Channel channel;
 
-    public DocumentRabbitmqProducer(RabbitmqConnectionManager connectionManager) {
+    public DocumentRabbitmqProducer(RabbitmqConnectionInitializerConfig connectionManager) {
         this.connectionManager = connectionManager;
     }
 

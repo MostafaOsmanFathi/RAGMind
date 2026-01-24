@@ -1,7 +1,13 @@
 package com.ragmind.ragbackend.dto.request;
 
 public class CreateCollectionRequestDto {
-    public String getName() {
-        return null;
+    private String collectionName;
+
+    public String getCollectionName() {
+        return collectionName;
+    }
+
+    public void setCollectionName(String collectionName) {
+        this.collectionName = collectionName;
     }
 }

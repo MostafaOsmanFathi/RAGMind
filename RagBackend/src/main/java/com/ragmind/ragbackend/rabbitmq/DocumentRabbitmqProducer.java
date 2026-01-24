@@ -39,7 +39,7 @@ public class DocumentRabbitmqProducer {
 
             channel.basicPublish(
                     EXCHANGE_NAME,
-                    "document.add",
+                    "doc.add",
                     null,
                     body
             );

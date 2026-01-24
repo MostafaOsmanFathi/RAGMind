@@ -56,7 +56,7 @@ public class CollectionService {
 
     public CollectionDto addCollection(CreateCollectionRequestDto createDocumentRequestDto, String userEmail) {
         Collection collection = new Collection();
-        collection.setCollectionName(createDocumentRequestDto.getName());
+        collection.setCollectionName(createDocumentRequestDto.getCollectionName());
         User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new ValidationException("User don't exists"));
         collection.setUser(user);
         collection.setChatHistory(new ArrayList<>());
@@ -93,7 +93,7 @@ public class CollectionService {
         return toDto(document);
     }
 
-    public void addDocument(Long collectionId, String documentPath, String docName,String collectionName,Authentication authentication) {
+    public void addDocument(Long collectionId, String documentPath, String docName, String collectionName, Authentication authentication) {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new IllegalArgumentException("Collection not found"));
 
@@ -103,7 +103,7 @@ public class CollectionService {
         document.setSharedPath(documentPath);
         document.setAddedDate(new Date());
 
-        documentRepository.save(document);
+        CollectionDocuments saved = documentRepository.save(document);
 
         collection.setNumberOfDocs(
                 collection.getNumberOfDocs() == null
@@ -118,6 +118,7 @@ public class CollectionService {
         rabbitmqRequestDto.setCollectionName(collectionName);
         rabbitmqRequestDto.setEmbedModel("nomic-embed-text");
         rabbitmqRequestDto.setLlmModel("mistral");
+        rabbitmqRequestDto.setTaskId(saved.getId());
 
         //TODO make llm models and embedder configurable
 

@@ -2,6 +2,9 @@ package com.ragmind.ragbackend.controller;
 
 import com.ragmind.ragbackend.dto.request.AddCollectionDocumentRequest;
 import com.ragmind.ragbackend.service.CollectionService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -59,9 +62,16 @@ class DocumentsController {
         }
     }
 
-    @PostMapping({"", "/"})
+    @PostMapping(value = {"", "/"}, consumes = "multipart/form-data")
     ResponseEntity<?> addDocument(
             @PathVariable Long collectionId,
+            @Parameter(
+                    description = "Document file to upload",
+                    content = @Content(
+                            mediaType = "multipart/form-data",
+                            schema = @Schema(type = "string", format = "binary")
+                    )
+            )
             @RequestParam("file") MultipartFile file,
             Authentication authentication
     ) {
@@ -72,7 +82,7 @@ class DocumentsController {
             }
             Path filePath = dirPath.resolve(Objects.requireNonNull(file.getOriginalFilename()));
             file.transferTo(filePath.toFile());
-            collectionService.addDocument(collectionId,filePath.toString(),file.getOriginalFilename(),collectionId.toString(),authentication);
+            collectionService.addDocument(collectionId, filePath.toString(), file.getOriginalFilename(), collectionId.toString(), authentication);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

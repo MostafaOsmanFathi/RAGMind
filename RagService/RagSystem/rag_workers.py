@@ -95,7 +95,8 @@ def worker_add_doc_query(ch, method, properties, body):
             user_id=message.user_id,
             collection_name=message.collection_name,
             llm_model=message.llm_model,
-            action=message.action
+            action=message.action,
+            taskId=message.taskId
         )
 
         feedback.status = 'success'

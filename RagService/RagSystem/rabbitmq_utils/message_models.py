@@ -9,6 +9,7 @@ class RagInit(BaseModel):
     collection_name: str
     llm_model: str
     embed_model: Optional[str] = None
+    taskId:str
 
 
 class RAGWorkerMessage(RagInit):
@@ -30,6 +31,8 @@ class FeedbackBase(BaseModel):
 class DocFeedback(FeedbackBase):
     action: Optional[str] = None   # add, remove, update
     result: Optional[str] = None
+    taskId:str
 
 class RAGFeedback(FeedbackBase):
     response: Optional[str] = None
+    taskId:str

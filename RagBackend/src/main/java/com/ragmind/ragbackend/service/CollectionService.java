@@ -88,7 +88,7 @@ public class CollectionService {
         return toDto(document);
     }
 
-    public void addDocument(Long collectionId, AddCollectionDocumentRequest request) {
+    public void addDocument(Long collectionId, AddCollectionDocumentRequest request,String documentPath) {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new IllegalArgumentException("Collection not found"));
 

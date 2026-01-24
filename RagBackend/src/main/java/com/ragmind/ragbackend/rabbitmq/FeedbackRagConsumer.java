@@ -2,8 +2,10 @@ package com.ragmind.ragbackend.rabbitmq;
 
 import com.rabbitmq.client.*;
 import com.ragmind.ragbackend.config.RabbitmqConnectionInitializerConfig;
+import com.ragmind.ragbackend.service.NotificationService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,9 +23,11 @@ public class FeedbackRagConsumer {
     private static final String QUEUE_NAME = "feedback.rag.queue";
     private static final String EXCHANGE_NAME = "rag_topic_feedback";
     private static final String ROUTING_KEY = "rag.#";
+    private final NotificationService notificationService;
 
-    public FeedbackRagConsumer(RabbitmqConnectionInitializerConfig rabbitConfig) {
+    public FeedbackRagConsumer(RabbitmqConnectionInitializerConfig rabbitConfig, NotificationService notificationService) {
         this.rabbitConfig = rabbitConfig;
+        this.notificationService = notificationService;
     }
 
     @PostConstruct
@@ -37,7 +41,8 @@ public class FeedbackRagConsumer {
         executor.submit(() -> {
             try {
                 System.out.println("FeedbackRagConsumer listening on queue: " + QUEUE_NAME);
-                channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {});
+                channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {
+                });
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -56,6 +61,7 @@ public class FeedbackRagConsumer {
         try {
             if (channel != null && channel.isOpen()) channel.close();
             executor.shutdownNow();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 }

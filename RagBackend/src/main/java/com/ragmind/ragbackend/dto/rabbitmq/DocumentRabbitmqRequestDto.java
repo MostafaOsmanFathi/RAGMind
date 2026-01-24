@@ -3,7 +3,7 @@ package com.ragmind.ragbackend.dto.rabbitmq;
 public class DocumentRabbitmqRequestDto extends RagInitDto {
     private String action;
     private String filePath;
-    private Long taskId;
+    private String taskId;
 
     public String getAction() {
         return action;
@@ -21,11 +21,11 @@ public class DocumentRabbitmqRequestDto extends RagInitDto {
         this.filePath = filePath;
     }
 
-    public Long getTaskId() {
+    public String getTaskId() {
         return taskId;
     }
 
-    public void setTaskId(Long taskId) {
+    public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 }

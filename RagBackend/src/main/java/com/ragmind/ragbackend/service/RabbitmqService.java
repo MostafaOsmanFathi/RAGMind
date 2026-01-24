@@ -25,7 +25,7 @@ public class RabbitmqService {
     }
 
     public void sendAskTask(AskRabbitmqRequestDto askRabbitmqRequestDto) {
-        chatService.saveMessage(askRabbitmqRequestDto.getQuestion(), Long.valueOf(askRabbitmqRequestDto.getCollectionName()));
+        chatService.saveMessage(askRabbitmqRequestDto.getQuestion(), "user", Long.valueOf(askRabbitmqRequestDto.getCollectionName()));
         ragRabbitmqProducer.sendAskTask(askRabbitmqRequestDto);
         //TODO update frontend client websocket with new message
     }

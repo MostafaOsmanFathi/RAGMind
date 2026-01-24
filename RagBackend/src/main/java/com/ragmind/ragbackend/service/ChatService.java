@@ -16,12 +16,12 @@ public class ChatService {
         this.collectionRepository = collectionRepository;
     }
 
-    public boolean saveMessage(String message, Long collectionId) {
+    public boolean saveMessage(String message, String role, Long collectionId) {
         try {
 
             CollectionChat collectionChat = new CollectionChat();
             collectionChat.setMessage(message);
-            collectionChat.setRole("user");
+            collectionChat.setRole(role);
             Collection collection = collectionRepository.findById(collectionId).orElseThrow();
             collectionChat.setCollection(collection);
             collectionChatRepository.save(collectionChat);

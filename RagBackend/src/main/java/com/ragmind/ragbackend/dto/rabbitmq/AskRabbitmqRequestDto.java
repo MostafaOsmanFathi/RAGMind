@@ -6,6 +6,7 @@ import java.util.Map;
 public class AskRabbitmqRequestDto extends RagInitDto {
     private String question;
     private Map<String, Object> options = new HashMap<>();
+    private String taskId;
 
     public String getQuestion() {
         return question;

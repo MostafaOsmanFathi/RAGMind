@@ -39,7 +39,7 @@ public class FeedbackDocumentConsumer {
         String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
         System.out.println("FeedbackDocumentConsumer received: " + message);
 
-        // TODO: process the message
+        // TODO: websocket message with status of the document
 
 
     };

@@ -118,9 +118,11 @@ public class CollectionService {
         rabbitmqRequestDto.setCollectionName(collectionName);
         rabbitmqRequestDto.setEmbedModel("nomic-embed-text");
         rabbitmqRequestDto.setLlmModel("mistral");
-        rabbitmqRequestDto.setTaskId(saved.getId());
-
+        rabbitmqRequestDto.setTaskId(saved.getId().toString());
         //TODO make llm models and embedder configurable
+
+        //TODO get static Backend id from docker
+        rabbitmqRequestDto.setBackendId("backend-1");
 
         rabbitmqService.sendDocumentTask(rabbitmqRequestDto);
     }

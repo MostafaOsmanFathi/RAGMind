@@ -1,10 +1,15 @@
 package com.ragmind.ragbackend.rabbitmq;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.*;
 import com.ragmind.ragbackend.config.RabbitmqConnectionInitializerConfig;
+import com.ragmind.ragbackend.service.ChatService;
+import com.ragmind.ragbackend.service.NotificationService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.ragmind.ragbackend.dto.rabbitmq.RagFeedbackResponseDto;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,9 +26,15 @@ public class FeedbackRagConsumer {
     private static final String QUEUE_NAME = "feedback.rag.queue";
     private static final String EXCHANGE_NAME = "rag_topic_feedback";
     private static final String ROUTING_KEY = "rag.#";
+    private final NotificationService notificationService;
+    ChatService chatService;
 
-    public FeedbackRagConsumer(RabbitmqConnectionInitializerConfig rabbitConfig) {
+    public FeedbackRagConsumer(RabbitmqConnectionInitializerConfig rabbitConfig,
+                               NotificationService notificationService,
+                               ChatService chatService) {
         this.rabbitConfig = rabbitConfig;
+        this.notificationService = notificationService;
+        this.chatService = chatService;
     }
 
     @PostConstruct
@@ -37,7 +48,8 @@ public class FeedbackRagConsumer {
         executor.submit(() -> {
             try {
                 System.out.println("FeedbackRagConsumer listening on queue: " + QUEUE_NAME);
-                channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {});
+                channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {
+                });
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -48,7 +60,11 @@ public class FeedbackRagConsumer {
         String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
         System.out.println("Received RAG feedback: " + message);
 
-        // TODO: process the message
+        ObjectMapper mapper = new ObjectMapper();
+        RagFeedbackResponseDto messageObj = mapper.readValue(message, RagFeedbackResponseDto.class);
+        chatService.saveMessage(messageObj.getResponse(), "system", Long.valueOf(messageObj.getCollectionName()));
+
+        //TODO send message throw websocket to web client
     };
 
     @PreDestroy
@@ -56,6 +72,7 @@ public class FeedbackRagConsumer {
         try {
             if (channel != null && channel.isOpen()) channel.close();
             executor.shutdownNow();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 }

@@ -1,27 +1,29 @@
 services:
-  rag-service:
-    build:
-      context: RagService/.
-    environment:
-      CHROMADB_PERSISTENT_CLIENT_PATH: '/app/chromadb/data'
-      SHARED_STORAGE_FILE_PATH: '/app/shared/files'
-      RABBITMQ_USER: guest
-      RABBITMQ_PASSWORD: guest
-      OLLAMA_URL: http://ollama:11434/
-      RABBITMQ_HOST: rabbitmq
-
-    networks:
-      - temp_network
-    volumes:
-      - shared_volume:/app/shared/files
-      - chromadb_volume:/app/chromadb/data
-    depends_on:
-      - rabbitmq
+#  rag-service:
+#    build:
+#      context: RagService/.
+#    environment:
+#      CHROMADB_PATH: '/app/chromadb/data'
+#      SHARED_STORAGE_FILE_PATH: '/app/shared/files'
+#      RABBITMQ_USER: guest
+#      RABBITMQ_PASSWORD: guest
+#      OLLAMA_URL: http://ollama:11434/
+#      RABBITMQ_HOST: rabbitmq
+#
+#    networks:
+#      - temp_network
+#    volumes:
+#      - shared_volume:/app/shared/files
+#      - chromadb_volume:/app/chromadb/data
+#    depends_on:
+#      - rabbitmq
 
   ollama:
     build: Ollama/.
     networks:
       - temp_network
+    ports:
+      - "11434:11434"
     volumes:
       - ollama_volume:/root/.ollama
 
@@ -35,16 +37,6 @@ services:
     volumes:
       - rabbitmq_volume:/var/lib/rabbitmq
 
-  rag-backend:
-    build: RagBackend/.
-    ports:
-      - "8080:8080"
-    networks:
-      - temp_network
-    volumes:
-      - shared_volume:/app/shared/files
-    depends_on:
-      - rabbitmq
   pg_database:
     build:
       context: Database/.
@@ -52,12 +44,13 @@ services:
         POSTGRES_DB: ragdb
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: admin_password
-
+    ports:
+      - "5432:5432"
     volumes:
       - pg_volume:/var/lib/postgresql/data
     networks:
       - temp_network
-    
+
 
 volumes:
   chromadb_volume:

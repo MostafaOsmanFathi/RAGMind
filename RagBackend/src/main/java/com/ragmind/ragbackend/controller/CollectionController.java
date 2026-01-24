@@ -45,11 +45,11 @@ class CollectionController {
     }
 
     @PostMapping({"/", ""})
-    ResponseEntity<?> addCollection(CreateCollectionRequestDto collectionRequestDto, Authentication authentication) {
+    ResponseEntity<?> addCollection(@RequestBody CreateCollectionRequestDto collectionRequestDto, Authentication authentication) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(
                     collectionService.addCollection(collectionRequestDto, authentication.getName()));
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("\"message\":Error");
         }
     }
@@ -59,7 +59,7 @@ class CollectionController {
 
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body("\"message\":successful");
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("\"message\":Error");
         }
     }

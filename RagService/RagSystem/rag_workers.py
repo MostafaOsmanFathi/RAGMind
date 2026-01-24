@@ -57,11 +57,12 @@ def worker_rag_query(ch, method, properties, body):
 
         # Feedback Backend Response
         feedback = RAGFeedback(
-            backend_id=message.backend_id,
-            user_id=message.user_id,
-            collection_name=message.collection_name,
+            backendId=message.backend_id,
+            userId=message.user_id,
+            collectionName=message.collection_name,
             response=response,
-            llm_model=message.llm_model
+            llmModel=message.llm_model,
+            taskId=message.taskId
         )
 
         feedback.status='success'
@@ -91,10 +92,10 @@ def worker_add_doc_query(ch, method, properties, body):
             raise Exception(f"Failed to add document: {message.file_path}")
 
         feedback = DocFeedback(
-            backend_id=message.backend_id,
-            user_id=message.user_id,
-            collection_name=message.collection_name,
-            llm_model=message.llm_model,
+            backendId=message.backend_id,
+            userId=message.user_id,
+            collectionName=message.collection_name,
+            llmModel=message.llm_model,
             action=message.action,
             taskId=message.taskId
         )

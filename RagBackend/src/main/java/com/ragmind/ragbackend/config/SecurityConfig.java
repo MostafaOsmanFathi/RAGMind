@@ -1,10 +1,9 @@
 package com.ragmind.ragbackend.config;
 
-import com.ragmind.ragbackend.security.JwtAuthFilter;
-import com.ragmind.ragbackend.security.JwtRefreshTokenFilter;
+import com.ragmind.ragbackend.security.filters.JwtAuthFilter;
+import com.ragmind.ragbackend.security.filters.JwtRefreshTokenFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,6 +19,7 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final JwtRefreshTokenFilter jwtRefreshTokenFilter;
+
     public SecurityConfig(JwtAuthFilter jwtAuthFilter, JwtRefreshTokenFilter jwtRefreshTokenFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.jwtRefreshTokenFilter = jwtRefreshTokenFilter;
@@ -40,6 +40,8 @@ public class SecurityConfig {
                                 //User Auth end points
                                 "/auth/login",
                                 "/auth/signup",
+                                //WebSocket end points ws will handel it's own secrutiy
+                                "/ws/**",
                                 //Swagger end points
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",

@@ -1,4 +1,4 @@
-package com.ragmind.ragbackend.security.Principal;
+package com.ragmind.ragbackend.security.principal;
 
 import java.security.Principal;
 

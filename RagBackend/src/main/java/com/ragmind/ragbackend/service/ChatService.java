@@ -5,6 +5,7 @@ import com.ragmind.ragbackend.entity.CollectionChat;
 import com.ragmind.ragbackend.repository.CollectionChatRepository;
 import com.ragmind.ragbackend.repository.CollectionRepository;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 
 @Service
@@ -17,7 +18,7 @@ public class ChatService {
         this.collectionRepository = collectionRepository;
     }
 
-    public boolean saveMessage(String message, String role, Long collectionId) {
+    public CollectionChat saveMessage(String message, String role, Long collectionId) {
         try {
 
             CollectionChat collectionChat = new CollectionChat();
@@ -26,11 +27,13 @@ public class ChatService {
             collectionChat.setDate(LocalDate.now());
             Collection collection = collectionRepository.findById(collectionId).orElseThrow();
             collectionChat.setCollection(collection);
-            collectionChatRepository.save(collectionChat);
-            return true;
+
+            collectionChat = collectionChatRepository.save(collectionChat);
+
+            return collectionChat;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return false;
+            return null;
         }
     }
 

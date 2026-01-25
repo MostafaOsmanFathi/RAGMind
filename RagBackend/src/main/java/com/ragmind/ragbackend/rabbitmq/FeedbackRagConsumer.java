@@ -3,8 +3,12 @@ package com.ragmind.ragbackend.rabbitmq;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.*;
 import com.ragmind.ragbackend.config.RabbitmqConnectionInitializerConfig;
+import com.ragmind.ragbackend.entity.User;
+import com.ragmind.ragbackend.repository.UserRepository;
 import com.ragmind.ragbackend.service.ChatService;
 import com.ragmind.ragbackend.service.NotificationService;
+import com.ragmind.ragbackend.service.UserService;
+import com.ragmind.ragbackend.service.WebSocketService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +31,19 @@ public class FeedbackRagConsumer {
     private static final String EXCHANGE_NAME = "rag_topic_feedback";
     private static final String ROUTING_KEY = "rag.#";
     private final NotificationService notificationService;
-    ChatService chatService;
+    private WebSocketService webSocketService;
+    private ChatService chatService;
+    private UserService userService;
+
 
     public FeedbackRagConsumer(RabbitmqConnectionInitializerConfig rabbitConfig,
-                               NotificationService notificationService,
-                               ChatService chatService) {
+                               NotificationService notificationService, WebSocketService webSocketService,
+                               ChatService chatService, UserService userService) {
         this.rabbitConfig = rabbitConfig;
         this.notificationService = notificationService;
+        this.webSocketService = webSocketService;
         this.chatService = chatService;
+        this.userService = userService;
     }
 
     @PostConstruct
@@ -57,6 +66,7 @@ public class FeedbackRagConsumer {
     }
 
     private final DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+        //TODO Optimize database hit for getting userEmail by userId
         String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
         System.out.println("Received RAG feedback: " + message);
 
@@ -64,7 +74,8 @@ public class FeedbackRagConsumer {
         RagFeedbackResponseDto messageObj = mapper.readValue(message, RagFeedbackResponseDto.class);
         chatService.saveMessage(messageObj.getResponse(), "system", Long.valueOf(messageObj.getCollectionName()));
 
-        //TODO send message throw websocket to web client
+        User user = userService.getUserById(Long.valueOf(messageObj.getUserId()));
+        webSocketService.syncUserMessages(user.getEmail(), messageObj);
     };
 
     @PreDestroy

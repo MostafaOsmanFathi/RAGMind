@@ -1,4 +1,4 @@
-package com.ragmind.ragbackend.security;
+package com.ragmind.ragbackend.security.filters;
 
 import com.ragmind.ragbackend.service.JwtService;
 import jakarta.servlet.FilterChain;

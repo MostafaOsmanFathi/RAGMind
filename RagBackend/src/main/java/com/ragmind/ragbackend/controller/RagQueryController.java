@@ -27,7 +27,7 @@ class RagQueryController {
     ResponseEntity<?> createQuery(@PathVariable String collectionId, @RequestBody AskRabbitmqRequestDto askRabbitmqRequestDto, Authentication authentication) {
         askRabbitmqRequestDto.setCollectionName(collectionId);
         try {
-            rabbitmqService.sendAskTask(askRabbitmqRequestDto);
+            rabbitmqService.sendAskTask(askRabbitmqRequestDto, authentication);
             return ResponseEntity.ok("Ask task sent successfully");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to send ask task: " + e.getMessage());

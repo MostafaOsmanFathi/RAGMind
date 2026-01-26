@@ -1,5 +1,6 @@
 package com.ragmind.ragbackend.service;
 
+import com.ragmind.ragbackend.dto.NotificationDTO;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,4 +19,9 @@ public class WebSocketService {
     public void syncUserMessages(String principalEmailName, Object payload) {
         sendToUser(principalEmailName, "/queue/ask-result", payload);
     }
+
+    public void syncUserNotification(String principalEmailName, NotificationDTO payload) {
+        sendToUser(principalEmailName, "/queue/sync-notification", payload);
+    }
+
 }

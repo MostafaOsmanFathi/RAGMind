@@ -16,6 +16,7 @@ It allows users to upload documents and ask questions, with responses generated 
 * **LLM inference** with Mistral phi-3
 * Designed for **high concurrency** with Java Spring Boot
 * **JWT Access & Refresh tokens** for secure and efficient user authentication
+* **Real-time updates** via WebSocket using STOMP
 
 ## Architecture & Scalability
 
@@ -37,22 +38,24 @@ It allows users to upload documents and ask questions, with responses generated 
 
 ## Tech Stack
 
-| Layer / Component | Tech / Framework                               |
-| ----------------- | ---------------------------------------------- |
-| LLM / AI Models   | Mistral phi-3                                  |
-| Embeddings        | nomic-embed-text                               |
-| Vector Database   | ChromaDB                                       |
-| Message Broker    | RabbitMQ                                       |
-| Backend           | Java Spring Boot (scalable, JWT Auth) + Python |
-| Frontend          | Angular (planned)                              |
-| Containerization  | Docker Compose                                 |
-| API Documentation | [See API Docs](./RagBackend/API.md)            |
+| Layer / Component | Tech / Framework                                |
+| ----------------- | ----------------------------------------------- |
+| LLM / AI Models   | Mistral phi-3                                   |
+| Embeddings        | nomic-embed-text                                |
+| Vector Database   | ChromaDB                                        |
+| Message Broker    | RabbitMQ                                        |
+| Backend           | Java Spring Boot (scalable, JWT Auth) + Python  |
+| Frontend          | Angular (planned)                               |
+| Containerization  | Docker Compose                                  |
+| API Documentation | [See API Docs](./RagBackend/API.md)             |
+| WebSocket         | [See WebSocket Docs](./RagBackend/WebSocket.md) |
 
 ## Setup / Dev Environment
 
 * **Docker Compose** based setup for all microservices
 * Services connected via RabbitMQ for async messaging
 * Backend APIs documented via **Swagger** ([link to Swagger docs](./RagBackend/API.md))
+* Real-time updates via **WebSocket** ([see docs](./RagBackend/WebSocket.md))
 
 ## Services / Modules
 

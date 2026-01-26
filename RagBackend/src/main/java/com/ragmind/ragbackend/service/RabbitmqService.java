@@ -1,5 +1,6 @@
 package com.ragmind.ragbackend.service;
 
+import com.ragmind.ragbackend.dto.CollectionChatDTO;
 import com.ragmind.ragbackend.dto.rabbitmq.AskRabbitmqRequestDto;
 import com.ragmind.ragbackend.dto.rabbitmq.DocumentRabbitmqRequestDto;
 import com.ragmind.ragbackend.entity.CollectionChat;
@@ -28,10 +29,12 @@ public class RabbitmqService {
         documentRabbitmqProducer.sendDocumentTask(documentRabbitmqRequestDto);
     }
 
+
     public void sendAskTask(AskRabbitmqRequestDto askRabbitmqRequestDto, Authentication authentication) {
         CollectionChat collectionChat = chatService.saveMessage(askRabbitmqRequestDto.getQuestion(), "user", Long.valueOf(askRabbitmqRequestDto.getCollectionName()));
+        CollectionChatDTO collectionChatDTO = chatService.toDto(collectionChat);
         ragRabbitmqProducer.sendAskTask(askRabbitmqRequestDto);
-        webSocketService.syncUserMessages(authentication.getName(), collectionChat);
+        webSocketService.syncUserMessages(authentication.getName(), collectionChatDTO);
     }
 
 }

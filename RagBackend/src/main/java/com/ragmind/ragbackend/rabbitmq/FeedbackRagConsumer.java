@@ -66,7 +66,6 @@ public class FeedbackRagConsumer {
     }
 
     private final DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-        //TODO Optimize database hit for getting userEmail by userId
         String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
         System.out.println("Received RAG feedback: " + message);
 
@@ -74,8 +73,7 @@ public class FeedbackRagConsumer {
         RagFeedbackResponseDto messageObj = mapper.readValue(message, RagFeedbackResponseDto.class);
         chatService.saveMessage(messageObj.getResponse(), "system", Long.valueOf(messageObj.getCollectionName()));
 
-        User user = userService.getUserById(Long.valueOf(messageObj.getUserId()));
-        webSocketService.syncUserMessages(user.getEmail(), messageObj);
+        webSocketService.syncUserMessages(messageObj.getUserId(), messageObj);
     };
 
     @PreDestroy

@@ -46,13 +46,13 @@ It allows users to upload documents and ask questions, with responses generated 
 | Backend           | Java Spring Boot (scalable, JWT Auth) + Python |
 | Frontend          | Angular (planned)                              |
 | Containerization  | Docker Compose                                 |
-| API Documentation | Swagger                                        |
+| API Documentation | [See API Docs](./RagBackend/API.md)            |
 
 ## Setup / Dev Environment
 
 * **Docker Compose** based setup for all microservices
 * Services connected via RabbitMQ for async messaging
-* Backend APIs documented via **Swagger** ([link to Swagger docs](#))
+* Backend APIs documented via **Swagger** ([link to Swagger docs](./RagBackend/API.md))
 
 ## Services / Modules
 

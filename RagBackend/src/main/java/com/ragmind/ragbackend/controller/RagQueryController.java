@@ -1,11 +1,14 @@
 package com.ragmind.ragbackend.controller;
 
+import com.ragmind.ragbackend.dto.CollectionChatDTO;
 import com.ragmind.ragbackend.dto.rabbitmq.AskRabbitmqRequestDto;
 import com.ragmind.ragbackend.dto.rabbitmq.DocumentRabbitmqRequestDto;
 import com.ragmind.ragbackend.entity.CollectionChat;
+import com.ragmind.ragbackend.service.ChatService;
 import com.ragmind.ragbackend.service.RabbitmqService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +21,11 @@ import java.util.List;
 class RagQueryController {
 
     final RabbitmqService rabbitmqService;
+    private final ChatService chatService;
 
-    public RagQueryController(RabbitmqService rabbitmqService) {
+    RagQueryController(RabbitmqService rabbitmqService, ChatService chatService) {
         this.rabbitmqService = rabbitmqService;
+        this.chatService = chatService;
     }
 
     @PostMapping("/ask")
@@ -36,11 +41,10 @@ class RagQueryController {
 
 
     @GetMapping("/chat-history")
-    ResponseEntity<?> getChat(@PathVariable String collectionId, @RequestBody DocumentRabbitmqRequestDto documentRabbitmqRequestDto) {
-        documentRabbitmqRequestDto.setCollectionName(collectionId);
+    ResponseEntity<?> getChat(@PathVariable String collectionId) {
         try {
-            rabbitmqService.sendDocumentTask(documentRabbitmqRequestDto);
-            return ResponseEntity.ok("Document task sent successfully");
+            List<CollectionChatDTO> result = chatService.getAllCollection(collectionId);
+            return ResponseEntity.status(200).body(result);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to send document task: " + e.getMessage());
         }

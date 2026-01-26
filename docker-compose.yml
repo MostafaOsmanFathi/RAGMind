@@ -1,4 +1,13 @@
 services:
+  reverse-proxy:
+    build: ReverseProxy/.
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      temp_network:
+    volumes:
+      - reverse-proxy-cache:/var/cache/nginx
   rag-service:
     build:
       context: RagService/.
@@ -66,7 +75,7 @@ volumes:
   ollama_volume:
   rabbitmq_volume:
   pg_volume:
-
+  reverse-proxy-cache:
 
 
 networks:

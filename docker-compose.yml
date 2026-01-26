@@ -9,6 +9,7 @@ services:
       RABBITMQ_PASSWORD: guest
       OLLAMA_URL: http://ollama:11434/
       RABBITMQ_HOST: rabbitmq
+      PYTHONUNBUFFERED: 1
 
     networks:
       - temp_network

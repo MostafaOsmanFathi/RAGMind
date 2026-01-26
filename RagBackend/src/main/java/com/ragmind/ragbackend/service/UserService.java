@@ -90,10 +90,14 @@ public class UserService {
         if (!user.getRefreshToken().equals(request.getRefreshToken())) {
             throw new Exception("Refresh Token Expired login again");
         }
-        
+
         String accessToken = jwtService.generateAccessToken(new HashMap<>(), user);
         GenerateAccessTokenResponse response = new GenerateAccessTokenResponse();
         response.setAccessToken(accessToken);
         return response;
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow();
     }
 }

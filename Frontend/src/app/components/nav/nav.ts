@@ -8,7 +8,6 @@ import {AuthService} from '../../services/auth-service';
   standalone: true,
   templateUrl: './nav.html',
   imports: [
-    AsyncPipe,
     RouterLink, RouterLinkActive
   ],
 })

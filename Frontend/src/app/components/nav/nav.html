@@ -1,7 +1,6 @@
 <nav class="w-full bg-bg-primary border-b border-border-dark border-opacity-50 sticky top-0 z-50">
   <div class="container-custom py-4 flex items-center justify-between">
 
-    <!-- Logo -->
     <div class="flex items-center gap-2 cursor-pointer" (click)="navigateHome()">
       <div class="w-8 h-8 bg-gradient-button rounded-lg flex items-center justify-center">
         <span class="text-white font-bold text-lg">🧠</span>
@@ -9,10 +8,7 @@
       <span class="text-xl font-bold gradient-text">RAGMind</span>
     </div>
 
-    <!-- Navigation Links -->
     <div class="flex items-center gap-8">
-
-      <!-- Public Links -->
       <a
         routerLink="/"
         routerLinkActive="text-accent-cyan"
@@ -30,9 +26,7 @@
         Docs
       </a>
 
-      @if (isAuthenticated$ | async) {
-
-        <!-- Authenticated Links -->
+      @if (isAuthenticated$) {
         <a
           routerLink="/collections"
           routerLinkActive="text-accent-cyan"
@@ -55,10 +49,7 @@
         >
           Logout
         </button>
-
       } @else {
-
-        <!-- Unauthenticated Links -->
         <a
           routerLink="/login"
           class="text-text-secondary hover:text-text-primary transition-colors duration-300"
@@ -72,7 +63,6 @@
         >
           Sign Up
         </a>
-
       }
     </div>
   </div>

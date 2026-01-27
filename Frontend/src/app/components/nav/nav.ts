@@ -1,11 +1,31 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {AsyncPipe} from '@angular/common';
+import {RouterLink, RouterLinkActive, Router} from '@angular/router';
+import {AuthService} from '../../services/auth-service';
 
 @Component({
   selector: 'app-nav',
-  imports: [],
+  standalone: true,
   templateUrl: './nav.html',
-  styleUrl: './nav.scss',
+  imports: [
+    AsyncPipe,
+    RouterLink, RouterLinkActive
+  ],
 })
-export class Nav {
+export class NavComponent {
 
+  isAuthenticated$;
+
+  constructor(private authService: AuthService, private router: Router) {
+    this.isAuthenticated$ = this.authService.isAuthenticated$;
+  }
+
+  navigateHome() {
+    this.router.navigate(["/"]);
+  }
+
+  logout() {
+    this.navigateHome()
+    this.authService.logout();
+  }
 }

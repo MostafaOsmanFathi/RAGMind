@@ -39,6 +39,7 @@
     "@angular/build": "^21.1.1",
     "@angular/cli": "^21.1.1",
     "@angular/compiler-cli": "^21.1.0",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/express": "^5.0.6",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",

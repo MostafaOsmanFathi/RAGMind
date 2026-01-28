@@ -1,12 +1,19 @@
 <nav class="w-full bg-bg-primary border-b border-border-dark border-opacity-50 sticky top-0 z-50">
   <div class="container-custom py-4 flex items-center justify-between">
 
-    <div class="flex items-center gap-2 cursor-pointer" (click)="navigateHome()">
-      <div class="w-8 h-8 bg-gradient-button rounded-lg flex items-center justify-center">
-        <span class="text-white font-bold text-lg">🧠</span>
+    <div
+      class="flex items-center gap-2 cursor-pointer" (click)="navigateHome()">
+      <div class="bg-gradient-button rounded-lg flex items-center justify-center p-1">
+        <img
+          src="/favicon.ico"
+          alt="Logo"
+          class="w-12 h-10 object-contain"
+        />
       </div>
+
       <span class="text-xl font-bold gradient-text">RAGMind</span>
     </div>
+
 
     <div class="flex items-center gap-8">
       <a

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, throwError} from 'rxjs';
 import {UserModel} from '../model/user-model'
 
 @Injectable({
@@ -18,6 +18,16 @@ export class AuthService {
   }
 
   logout(): void {
+
+  }
+
+
+  register(name: string, email: string, password: string) {
+    return throwError(() => new Error('Email already exists'));
+  }
+
+  login(email: string, password: string) {
+    return throwError(() => new Error('Email already exists'));
 
   }
 }

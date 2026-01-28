@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import {Landing} from './pages/landing/landing';
 import {Login} from './pages/login/login';
-import {Register} from './pages/register/register';
+import Register from './pages/register/register';
 import {Collection} from './pages/collection/collection';
 import {Collections} from './pages/collections/collections';
 import {Settings} from './pages/settings/settings';

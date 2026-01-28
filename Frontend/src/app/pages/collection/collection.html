@@ -1,0 +1,95 @@
+<div class="min-h-screen bg-bg-primary py-8 px-4">
+  <div class="container-custom">
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-text-primary mb-2">{{ collectionName }}</h1>
+      <p class="text-text-secondary">Upload documents and chat with your content</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
+
+      <div class="lg:col-span-1 flex flex-col">
+        <div class="card-glass p-6 flex flex-col h-full">
+          <h2 class="text-xl font-semibold text-text-primary mb-4">Documents</h2>
+
+          <div (click)="onUploadClick()"
+               class="border-2 border-dashed border-border-dark border-opacity-50 rounded-lg p-6 text-center mb-6 cursor-pointer hover:border-accent-cyan transition-colors">
+            <div class="text-4xl mb-2">📤</div>
+            <p class="text-sm text-text-secondary mb-1">Drag and drop or click to upload</p>
+            <p class="text-xs text-text-muted">PDF, TXT, DOCX up to 10MB</p>
+          </div>
+
+          <div class="space-y-3 flex-1 overflow-y-auto">
+            @for (doc of documents; track doc.id) {
+              <div class="p-3 bg-bg-secondary bg-opacity-30 rounded-lg">
+                <div class="flex items-start justify-between mb-2">
+                  <div class="flex-1">
+                    <p class="text-text-primary font-medium text-sm">{{ doc.name }}</p>
+                    <p class="text-text-muted text-xs">{{ doc.size }}</p>
+                  </div>
+                  <div class="flex-shrink-0 ml-2">
+                    @switch (doc.status) {
+                      @case ('indexed') { <span class="inline-block w-2 h-2 rounded-full bg-accent-cyan"></span> }
+                      @case ('processing') { <span class="pulse-indicator"></span> }
+                      @case ('error') { <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span> }
+                    }
+                  </div>
+                </div>
+                <p class="text-text-muted text-xs">{{ doc.uploadedAt }}</p>
+              </div>
+            } @empty {
+              <div class="text-center py-8">
+                <div class="text-3xl mb-2">📄</div>
+                <p class="text-text-muted text-sm">No documents yet</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 flex flex-col">
+        <div class="card-glass p-6 flex-1 flex flex-col">
+          <h2 class="text-xl font-semibold text-text-primary mb-4">Chat</h2>
+
+          <div #messagesContainer class="flex-1 overflow-y-auto mb-4 space-y-4">
+            @for (msg of chatMessages; track msg.id) {
+              <div class="flex gap-3">
+                @if (msg.role === 'user') {
+                  <div class="w-full flex justify-end">
+                    <div class="bg-accent-cyan bg-opacity-20 border border-accent-cyan border-opacity-30 rounded-lg p-3 max-w-xs">
+                      <p class="text-text-primary text-sm">{{ msg.content }}</p>
+                      <p class="text-text-muted text-xs mt-1">{{ msg.timestamp }}</p>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="w-full flex justify-start">
+                    <div class="bg-bg-secondary bg-opacity-50 border border-border-dark border-opacity-50 rounded-lg p-3 max-w-xs">
+                      <p class="text-text-primary text-sm">{{ msg.content }}</p>
+                      <p class="text-text-muted text-xs mt-1">{{ msg.timestamp }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @empty {
+              <div class="text-center py-12">
+                <div class="text-4xl mb-2">💬</div>
+                <p class="text-text-muted text-sm">No messages yet. Upload documents and start asking questions!</p>
+              </div>
+            }
+          </div>
+
+          <div class="flex gap-2">
+            <input
+              type="text"
+              [(ngModel)]="messageInput"
+              (keyup.enter)="sendMessage()"
+              placeholder="Ask something about your documents..."
+              class="flex-1 px-4 py-2 rounded-lg bg-bg-secondary bg-opacity-50 border border-border-dark border-opacity-50 text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-cyan focus:border-opacity-100 transition-colors"
+            />
+            <button (click)="sendMessage()" class="btn-primary px-6">Send</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

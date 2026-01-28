@@ -1,0 +1,52 @@
+<div class="min-h-screen bg-bg-primary py-12 px-4">
+  <div class="container-custom">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-12">
+      <div>
+        <h1 class="text-4xl font-bold text-text-primary mb-2">My Collections</h1>
+        <p class="text-text-secondary">Manage your document collections and chats</p>
+      </div>
+      <button class="btn-primary" (click)="createCollection()">
+        + Create Collection
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (collection of collectionsData; track collection.id) {
+        <a
+          [routerLink]="['/collection', collection.id]"
+          class="card-glass p-6 cursor-pointer transition-transform duration-300 hover:scale-105 hover:bg-opacity-60"
+        >
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <h3 class="text-xl font-semibold text-text-primary">{{ collection.name }}</h3>
+              <p class="text-text-muted text-sm">Collection</p>
+            </div>
+            <span class="w-10 h-10 bg-gradient-button rounded-lg flex items-center justify-center text-xl">
+              📚
+            </span>
+          </div>
+
+          <p class="text-text-secondary text-sm mb-4">{{ collection.description }}</p>
+
+          <div class="flex items-center justify-between pt-4 border-t border-border-dark border-opacity-30">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">📄</span>
+              <span class="text-text-muted text-sm">{{ collection.documentCount }} documents</span>
+            </div>
+          </div>
+        </a>
+      } @empty {
+        <div class="col-span-full card-glass p-12 text-center">
+          <div class="text-6xl mb-4">📁</div>
+          <h2 class="text-2xl font-semibold text-text-primary mb-2">No Collections Yet</h2>
+          <p class="text-text-secondary mb-6">
+            Create your first collection to get started chatting with your documents.
+          </p>
+          <button class="btn-primary" (click)="createCollection()">
+            Create Your First Collection
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

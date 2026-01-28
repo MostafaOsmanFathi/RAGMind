@@ -8,6 +8,9 @@ services:
       temp_network:
     volumes:
       - reverse-proxy-cache:/var/cache/nginx
+    depends_on:
+      - frontend
+      - rag-backend
   rag-service:
     build:
       context: RagService/.
@@ -27,6 +30,11 @@ services:
       - chromadb_volume:/app/chromadb/data
     depends_on:
       - rabbitmq
+
+  frontend:
+    build: Frontend/.
+    networks:
+      - temp_network
 
   ollama:
     build: Ollama/.

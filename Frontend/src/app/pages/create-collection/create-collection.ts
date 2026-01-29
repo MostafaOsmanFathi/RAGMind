@@ -29,7 +29,7 @@ export class CreateCollection {
     this.collectionService.addCollection(this.collectionName).subscribe({
       next: (collection) => {
         this.isLoading = false;
-        this.router.navigate(['/collection', collection.id]);
+        this.router.navigate(['/collections', collection.id]);
       },
       error: (err) => {
         this.isLoading = false;

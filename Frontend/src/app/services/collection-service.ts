@@ -144,9 +144,15 @@ export class CollectionService {
     }
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`${this.apiUrl}/${collectionId}/documents`, formData, {
-      headers: this.getHeaders()
-    }).pipe(
+    return this.http.post(
+        `${this.apiUrl}/${collectionId}/documents`,
+        formData,
+        {
+          headers: new HttpHeaders({
+            Authorization: `Bearer ${user.accessToken}`
+          })
+        }
+    ).pipe(
       tap(() => {
         this.authService.refreshUserData().subscribe();
         this.refreshCollections().subscribe();
@@ -156,7 +162,7 @@ export class CollectionService {
 
 
   private queryApiUrl(collectionId: string | number) {
-    return `${this.baseUrl}/rag/collection/${collectionId}/queries`;
+    return `${this.baseUrl}/rag/collections/${collectionId}/queries`;
   }
 
   askQuestion(collectionId: string | number, questionData: any): Observable<any> {

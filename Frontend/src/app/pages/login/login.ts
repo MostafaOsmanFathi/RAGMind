@@ -17,6 +17,7 @@ export class Login {
   password = "";
   isLoading = false;
   error = "";
+  successMessage = "";
 
   constructor(
     private authService: AuthService,
@@ -32,15 +33,22 @@ export class Login {
 
     this.isLoading = true;
     this.error = "";
-    //TODO move logic to services
+    this.successMessage = "";
+
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
-        this.router.navigate(["/collections"]);
+        this.successMessage = "Login successful! Redirecting...";
+        // Keep isLoading = true to prevent double-submit during redirection delay
+        setTimeout(() => {
+          this.isLoading = false;
+          this.router.navigate(["/collections"]);
+        }, 1500);
       },
       error: (err) => {
-        this.error = "Invalid email or password";
         this.isLoading = false;
-      },
+        // Extract error message from HttpErrorResponse
+        this.error = err.error?.message || (typeof err.error === 'string' ? err.error : null) || "Invalid email or password";
+      }
     });
   }
 }

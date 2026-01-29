@@ -1,5 +1,8 @@
 package com.ragmind.ragbackend.service;
 
+import com.ragmind.ragbackend.dto.UserDTO;
+import com.ragmind.ragbackend.dto.request.ChangePasswordRequest;
+import com.ragmind.ragbackend.dto.request.UpdateUserRequest;
 import com.ragmind.ragbackend.dto.request.GenerateAccessTokenRequest;
 import com.ragmind.ragbackend.dto.request.UserLoginRequest;
 import com.ragmind.ragbackend.dto.request.UserSignupRequest;
@@ -98,10 +101,53 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow();
+        return userRepository.findById(id).orElseThrow(() -> new ValidationException("User not found"));
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow();
+        return userRepository.findByEmail(email).orElseThrow(() -> new ValidationException("User not found"));
+    }
+
+    public UserDTO getUserDTOByEmail(String email) {
+        User user = getUserByEmail(email);
+        return toDto(user);
+    }
+
+    public UserDTO updateUser(String email, UpdateUserRequest request) {
+        User user = getUserByEmail(email);
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+        userRepository.save(user);
+        return toDto(user);
+    }
+
+    public void changePassword(String email, ChangePasswordRequest request) {
+        User user = getUserByEmail(email);
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new ValidationException("Invalid old password");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    public void deleteUser(String email) {
+        User user = getUserByEmail(email);
+        userRepository.delete(user);
+    }
+
+    private UserDTO toDto(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setUserEnabled(user.isUserEnabled());
+        // We don't set password or refreshToken in DTO for security reasons usually, 
+        // but UserDTO has them. I will follow the UserDTO structure but maybe leave them null.
+        return dto;
     }
 }

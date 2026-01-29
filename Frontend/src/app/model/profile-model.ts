@@ -1,5 +1,5 @@
 export interface ProfileModel {
-  name: String,
-  email: String,
-  bio: String,
+  name: string,
+  email: string,
+  bio: string,
 }

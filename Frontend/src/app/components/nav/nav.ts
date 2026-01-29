@@ -8,7 +8,7 @@ import {AuthService} from '../../services/auth-service';
   standalone: true,
   templateUrl: './nav.html',
   imports: [
-    RouterLink, RouterLinkActive
+    RouterLink, RouterLinkActive, AsyncPipe
   ],
 })
 export class NavComponent {

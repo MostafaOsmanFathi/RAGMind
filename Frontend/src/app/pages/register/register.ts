@@ -39,6 +39,7 @@ class Register {
   confirmPassword = "";
   isLoading = false;
   error = "";
+  successMessage = "";
 
   registerForm;
 
@@ -59,7 +60,7 @@ class Register {
   }
 
 
-  async onSubmit() {
+  onSubmit() {
     if (!this.name || !this.email || !this.password || !this.confirmPassword) {
       this.error = "Please fill in all fields";
       return;
@@ -77,15 +78,29 @@ class Register {
 
     this.isLoading = true;
     this.error = "";
+    this.successMessage = "";
 
-    //TODO move the logic to service
     this.authService.register(this.name, this.email, this.password).subscribe({
       next: () => {
-        this.router.navigate(["/collections"]);
+        this.successMessage = "Account created successfully! Logging in...";
+        // Automatically log in after registration for better UX
+        this.authService.login(this.email, this.password).subscribe({
+          next: () => {
+            this.isLoading = false;
+            setTimeout(() => {
+              this.router.navigate(["/collections"]);
+            }, 1500);
+          },
+          error: () => {
+            this.isLoading = false;
+            // If auto-login fails, redirect to login page
+            this.router.navigate(["/login"]);
+          }
+        });
       },
       error: (err) => {
-        this.error = "Failed to create account. Email may already exist.";
         this.isLoading = false;
+        this.error = err.error?.message || (typeof err.error === 'string' ? err.error : null) || "Failed to create account. Email may already exist.";
       },
     });
   }

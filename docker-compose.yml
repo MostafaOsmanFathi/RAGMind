@@ -6,8 +6,8 @@ services:
       - "443:443"
     networks:
       temp_network:
-    volumes:
-      - reverse-proxy-cache:/var/cache/nginx
+   volumes:
+     - reverse-proxy-cache:/var/cache/nginx
     depends_on:
       - frontend
       - rag-backend

@@ -11,6 +11,13 @@
           <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-cyan mb-4"></div>
           <p class="text-text-secondary animate-pulse">Loading collection data...</p>
         </div>
+      } @else if (loadError) {
+        <div class="col-span-full card-glass p-12 text-center">
+          <div class="text-6xl mb-4">⚠️</div>
+          <h2 class="text-2xl font-semibold text-text-primary mb-2">Could not load collection</h2>
+          <p class="text-text-secondary mb-6">{{ loadError }}</p>
+          <button class="btn-primary" (click)="loadCollectionData()">Retry</button>
+        </div>
       } @else {
         <div class="lg:col-span-1 flex flex-col">
           <div class="card-glass p-6 flex flex-col h-full">

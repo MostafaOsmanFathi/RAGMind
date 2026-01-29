@@ -5,7 +5,7 @@ import {DocumentModel} from '../../model/document-model';
 import {ChatRecordModel} from '../../model/chat-record-model';
 import {CollectionService} from '../../services/collection-service';
 import {isPlatformBrowser} from '@angular/common';
-import {catchError, forkJoin, of, finalize} from 'rxjs';
+import {catchError, forkJoin, of, finalize, timeout} from 'rxjs';
 
 @Component({
   selector: 'app-collection',
@@ -23,6 +23,7 @@ export class Collection implements OnInit {
   private collectionService = inject(CollectionService);
   private platformId = inject(PLATFORM_ID);
   isLoading = true;
+  loadError: string | null = null;
 
   @ViewChild("messagesContainer") messagesContainer!: ElementRef<HTMLDivElement>;
   documents: DocumentModel[] = [];
@@ -45,33 +46,39 @@ export class Collection implements OnInit {
     });
   }
 
-  private loadCollectionData() {
+  loadCollectionData(): void {
     if (this.collectionId === null) return;
     this.isLoading = true;
+    this.loadError = null;
 
     forkJoin({
       collection: this.collectionService.getCollectionById(this.collectionId).pipe(
+        timeout(15000),
         catchError(err => {
           console.error('Error loading collection info', err);
           return of({ name: 'Collection' } as any);
         })
       ),
       documents: this.collectionService.getDocuments(this.collectionId).pipe(
+        timeout(15000),
         catchError(err => {
           console.error('Error loading documents', err);
           return of([]);
         })
       ),
       history: this.collectionService.getChatHistory(this.collectionId).pipe(
+        timeout(15000),
         catchError(err => {
           console.error('Error loading chat history', err);
           return of([]);
         })
       )
     }).pipe(
+      timeout(20000),
       finalize(() => this.isLoading = false)
     ).subscribe({
       next: (results) => {
+        this.loadError = null;
         this.collectionName = results.collection.name || 'Collection';
         this.documents = results.documents.map(d => ({
           id: d.id,
@@ -90,6 +97,9 @@ export class Collection implements OnInit {
       },
       error: (err) => {
         console.error('Critical error loading collection data', err);
+        this.loadError = err?.name === 'TimeoutError'
+          ? 'Request timed out. Check that the API is running at the configured URL.'
+          : 'Failed to load collection. Check your connection and that the API is reachable.';
       }
     });
   }

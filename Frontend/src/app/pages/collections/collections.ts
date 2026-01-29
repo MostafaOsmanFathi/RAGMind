@@ -2,7 +2,7 @@ import {Component, inject, OnDestroy, OnInit, PLATFORM_ID} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {CollectionModel} from '../../model/collection-model';
 import {CollectionService} from '../../services/collection-service';
-import {finalize, Subscription} from 'rxjs';
+import {finalize, Subscription, timeout} from 'rxjs';
 import {isPlatformBrowser} from '@angular/common';
 
 @Component({
@@ -19,27 +19,39 @@ export class Collections implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   collectionsData: CollectionModel[] = [];
   isLoading = true;
+  loadError: string | null = null;
   private subscription?: Subscription;
 
   ngOnInit(): void {
     this.subscription = this.collectionService.collections$.subscribe({
       next: (data) => {
         this.collectionsData = data;
-        // Even if empty, if we've received an emission after the initial one,
-        // it means we have data (or lack thereof) to show.
-        // However, we rely more on the refreshCollections call below for the initial load.
       }
     });
 
     if (isPlatformBrowser(this.platformId)) {
-      this.collectionService.refreshCollections(20).pipe(
-        finalize(() => this.isLoading = false)
-      ).subscribe({
-        error: (err) => console.error('Error refreshing collections', err)
-      });
+      this.loadCollections();
     } else {
       this.isLoading = false;
     }
+  }
+
+  loadCollections(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    this.loadError = null;
+    this.isLoading = true;
+    this.collectionService.refreshCollections(20).pipe(
+      timeout(15000),
+      finalize(() => this.isLoading = false)
+    ).subscribe({
+      next: () => { this.loadError = null; },
+      error: (err) => {
+        console.error('Error refreshing collections', err);
+        this.loadError = err?.name === 'TimeoutError'
+          ? 'Request timed out. Check that the API is running at the configured URL.'
+          : 'Failed to load collections. Check your connection and that the API is reachable.';
+      }
+    });
   }
 
   ngOnDestroy(): void {

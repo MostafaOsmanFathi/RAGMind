@@ -101,4 +101,17 @@ export class AuthService {
       })
     );
   }
+
+  refreshUserData(): Observable<UserModel> {
+    const user = this.currentUserSubject.value;
+    if (!user || !user.accessToken) {
+      return throwError(() => new Error('No access token available'));
+    }
+    const headers = { Authorization: `Bearer ${user.accessToken}` };
+    return this.http.get<UserModel>(`${this.baseUrl}/user/me`, { headers }).pipe(
+      tap(updatedUser => {
+        this.updateCurrentUser(updatedUser);
+      })
+    );
+  }
 }

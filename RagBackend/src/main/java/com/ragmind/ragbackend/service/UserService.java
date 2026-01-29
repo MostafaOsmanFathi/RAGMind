@@ -9,6 +9,7 @@ import com.ragmind.ragbackend.dto.request.UserSignupRequest;
 import com.ragmind.ragbackend.dto.response.GenerateAccessTokenResponse;
 import com.ragmind.ragbackend.dto.response.LoginResponse;
 import com.ragmind.ragbackend.dto.response.SignupResponse;
+import com.ragmind.ragbackend.entity.Collection;
 import com.ragmind.ragbackend.entity.User;
 import com.ragmind.ragbackend.repository.UserRepository;
 import jakarta.validation.ValidationException;
@@ -75,6 +76,15 @@ public class UserService {
         loginResponse.setAccessToken(accessToken);
         loginResponse.setRefreshToken(refreshToken);
         loginResponse.setEmail(user.getEmail());
+        loginResponse.setName(user.getName());
+
+        int collectionCount = user.getUserCollections() != null ? user.getUserCollections().size() : 0;
+        int documentCount = user.getUserCollections() != null ?
+                user.getUserCollections().stream()
+                        .mapToInt(c -> c.getNumberOfDocs() != null ? c.getNumberOfDocs() : 0)
+                        .sum() : 0;
+        loginResponse.setCollectionCount(collectionCount);
+        loginResponse.setDocumentCount(documentCount);
 
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
@@ -146,8 +156,15 @@ public class UserService {
         dto.setEmail(user.getEmail());
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setUserEnabled(user.isUserEnabled());
-        // We don't set password or refreshToken in DTO for security reasons usually, 
-        // but UserDTO has them. I will follow the UserDTO structure but maybe leave them null.
+
+        int collectionCount = user.getUserCollections() != null ? user.getUserCollections().size() : 0;
+        int documentCount = user.getUserCollections() != null ?
+                user.getUserCollections().stream()
+                        .mapToInt(c -> c.getNumberOfDocs() != null ? c.getNumberOfDocs() : 0)
+                        .sum() : 0;
+        dto.setCollectionCount(collectionCount);
+        dto.setDocumentCount(documentCount);
+
         return dto;
     }
 }

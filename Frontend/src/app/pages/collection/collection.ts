@@ -1,8 +1,11 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, OnInit, ViewChild, PLATFORM_ID} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {DocumentModel} from '../../model/document-model';
 import {ChatRecordModel} from '../../model/chat-record-model';
+import {CollectionService} from '../../services/collection-service';
+import {isPlatformBrowser} from '@angular/common';
+import {catchError, forkJoin, of, finalize} from 'rxjs';
 
 @Component({
   selector: 'app-collection',
@@ -12,20 +15,17 @@ import {ChatRecordModel} from '../../model/chat-record-model';
   templateUrl: './collection.html',
   styleUrl: './collection.scss',
 })
-export class Collection {
+export class Collection implements OnInit {
   collectionName = "Collection";
   messageInput = "";
   private shouldScroll = true;
+  private collectionId: number | null = null;
+  private collectionService = inject(CollectionService);
+  private platformId = inject(PLATFORM_ID);
+  isLoading = true;
 
   @ViewChild("messagesContainer") messagesContainer!: ElementRef<HTMLDivElement>;
-  documents: DocumentModel[] = [
-    {
-      id: "doc-1",
-      name: "Annual_Report_2024.pdf",
-      size: "2.4 MB",
-      uploadedAt: "Today at 10:30 AM",
-      status: "indexed",
-    }];
+  documents: DocumentModel[] = [];
   chatMessages: ChatRecordModel[] = []
 
   constructor(private route: ActivatedRoute) {
@@ -33,8 +33,64 @@ export class Collection {
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
-      const collectionId = params.get("cid");
-      this.collectionName = `Collection ${collectionId}`;
+      const cid = params.get("cid");
+      if (cid) {
+        this.collectionId = parseInt(cid, 10);
+        if (isPlatformBrowser(this.platformId)) {
+          this.loadCollectionData();
+        } else {
+          this.isLoading = false;
+        }
+      }
+    });
+  }
+
+  private loadCollectionData() {
+    if (this.collectionId === null) return;
+    this.isLoading = true;
+
+    forkJoin({
+      collection: this.collectionService.getCollectionById(this.collectionId).pipe(
+        catchError(err => {
+          console.error('Error loading collection info', err);
+          return of({ name: 'Collection' } as any);
+        })
+      ),
+      documents: this.collectionService.getDocuments(this.collectionId).pipe(
+        catchError(err => {
+          console.error('Error loading documents', err);
+          return of([]);
+        })
+      ),
+      history: this.collectionService.getChatHistory(this.collectionId).pipe(
+        catchError(err => {
+          console.error('Error loading chat history', err);
+          return of([]);
+        })
+      )
+    }).pipe(
+      finalize(() => this.isLoading = false)
+    ).subscribe({
+      next: (results) => {
+        this.collectionName = results.collection.name || 'Collection';
+        this.documents = results.documents.map(d => ({
+          id: d.id,
+          name: d.fileName || d.name,
+          size: d.size || 'Unknown',
+          uploadedAt: d.uploadedAt || 'Unknown',
+          status: d.status || 'indexed'
+        }));
+        this.chatMessages = results.history.map(h => ({
+          id: h.id,
+          role: h.role,
+          content: h.content,
+          timestamp: h.timestamp || new Date().toLocaleTimeString()
+        }));
+        this.shouldScroll = true;
+      },
+      error: (err) => {
+        console.error('Critical error loading collection data', err);
+      }
     });
   }
 
@@ -64,7 +120,7 @@ export class Collection {
   }
 
   sendMessage() {
-    if (!this.messageInput.trim()) return;
+    if (!this.messageInput.trim() || this.collectionId === null) return;
 
     const userMessage: ChatRecordModel = {
       id: "msg-" + Date.now(),
@@ -77,27 +133,50 @@ export class Collection {
     };
 
     this.chatMessages.push(userMessage);
+    const question = this.messageInput;
     this.messageInput = "";
     this.shouldScroll = true;
 
-    //TODO remove it and will be handled with websocket connection later
-    // Simulate assistant response
-    setTimeout(() => {
-      const assistantMessage: ChatRecordModel = {
-        id: "msg-" + (Date.now() + 1),
-        role: "assistant",
-        content: "This is a mock response. Real responses will come from the backend API.",
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      };
-      this.chatMessages.push(assistantMessage);
-      this.shouldScroll = true;
-    }, 500);
+    this.collectionService.askQuestion(this.collectionId, { question }).subscribe({
+      next: (response) => {
+        const assistantMessage: ChatRecordModel = {
+          id: response.id || ("msg-" + Date.now()),
+          role: "assistant",
+          content: response.answer || response.content,
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        this.chatMessages.push(assistantMessage);
+        this.shouldScroll = true;
+      },
+      error: (err) => {
+        console.error('Error asking question', err);
+        const errorMessage: ChatRecordModel = {
+          id: "msg-" + Date.now(),
+          role: "assistant",
+          content: "Sorry, I encountered an error while processing your request.",
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        this.chatMessages.push(errorMessage);
+        this.shouldScroll = true;
+      }
+    });
   }
 
-  protected onUploadClick() {
-
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file && this.collectionId !== null) {
+      this.collectionService.addDocument(this.collectionId, file).subscribe({
+        next: () => {
+          this.loadCollectionData();
+        },
+        error: (err) => console.error('Error uploading document', err)
+      });
+    }
   }
 }

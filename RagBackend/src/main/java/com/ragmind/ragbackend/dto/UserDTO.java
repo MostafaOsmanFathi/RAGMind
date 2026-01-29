@@ -11,6 +11,8 @@ public class UserDTO {
     private String password;
     private String refreshToken;
     private String phoneNumber;
+    private int collectionCount;
+    private int documentCount;
 
 
     public UserDTO() {
@@ -18,7 +20,7 @@ public class UserDTO {
 
     public UserDTO(Long id, String name, boolean userEnabled, String email,
                    String password, String refreshToken, String phoneNumber,
-                   List<Long> userCollectionIds, List<Long> notificationIds) {
+                   int collectionCount, int documentCount) {
         this.id = id;
         this.name = name;
         this.userEnabled = userEnabled;
@@ -26,7 +28,8 @@ public class UserDTO {
         this.password = password;
         this.refreshToken = refreshToken;
         this.phoneNumber = phoneNumber;
-
+        this.collectionCount = collectionCount;
+        this.documentCount = documentCount;
     }
 
     public Long getId() {
@@ -83,5 +86,21 @@ public class UserDTO {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public int getCollectionCount() {
+        return collectionCount;
+    }
+
+    public void setCollectionCount(int collectionCount) {
+        this.collectionCount = collectionCount;
+    }
+
+    public int getDocumentCount() {
+        return documentCount;
+    }
+
+    public void setDocumentCount(int documentCount) {
+        this.documentCount = documentCount;
     }
 }

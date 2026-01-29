@@ -14,9 +14,11 @@ import {AuthService} from '../../services/auth-service';
 export class NavComponent {
 
   isAuthenticated$;
+  currentUser$;
 
   constructor(private authService: AuthService, private router: Router) {
     this.isAuthenticated$ = this.authService.isAuthenticated$;
+    this.currentUser$ = this.authService.currentUser$;
   }
 
   navigateHome() {

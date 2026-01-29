@@ -5,6 +5,8 @@ public class LoginResponse {
     private String email;
     private String accessToken;
     private String refreshToken;
+    private int collectionCount;
+    private int documentCount;
 
     public String getName() {
         return name;
@@ -36,5 +38,21 @@ public class LoginResponse {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public int getCollectionCount() {
+        return collectionCount;
+    }
+
+    public void setCollectionCount(int collectionCount) {
+        this.collectionCount = collectionCount;
+    }
+
+    public int getDocumentCount() {
+        return documentCount;
+    }
+
+    public void setDocumentCount(int documentCount) {
+        this.documentCount = documentCount;
     }
 }

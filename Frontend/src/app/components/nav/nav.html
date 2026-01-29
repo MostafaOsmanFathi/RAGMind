@@ -26,6 +26,17 @@
       </a>
 
       @if (isAuthenticated$ | async) {
+        <div class="hidden md:flex items-center gap-4 text-xs text-text-muted border-l border-border-dark pl-4 ml-4">
+          <div class="flex flex-col">
+            <span class="text-text-primary font-semibold">{{ (currentUser$ | async)?.collectionCount || 0 }}</span>
+            <span>Collections</span>
+          </div>
+          <div class="flex flex-col border-l border-border-dark pl-4">
+            <span class="text-text-primary font-semibold">{{ (currentUser$ | async)?.documentCount || 0 }}</span>
+            <span>Documents</span>
+          </div>
+        </div>
+
         <a
           routerLink="/collections"
           routerLinkActive="text-accent-cyan"

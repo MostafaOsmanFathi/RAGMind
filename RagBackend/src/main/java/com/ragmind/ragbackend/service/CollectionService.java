@@ -110,6 +110,7 @@ public class CollectionService {
                         ? 1
                         : collection.getNumberOfDocs() + 1
         );
+        collectionRepository.save(collection);
 
         DocumentRabbitmqRequestDto rabbitmqRequestDto = new DocumentRabbitmqRequestDto();
         rabbitmqRequestDto.setAction("add");

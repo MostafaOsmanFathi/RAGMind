@@ -23,13 +23,10 @@ class CollectionController {
     }
 
     @GetMapping({"/", ""})
-    ResponseEntity<List<CollectionDto>> getAllUserCollections(Authentication authentication,
-                                                              @RequestParam(name = "limit", defaultValue = "5") int limit,
-                                                              @RequestParam(name = "page", defaultValue = "0") int page
-    ) {
+    ResponseEntity<List<CollectionDto>> getAllUserCollections(Authentication authentication) {
         try {
             String email = authentication.getName();
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(collectionService.getAllCollection(email, limit, page));
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(collectionService.getAllCollection(email));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(List.of());
         }

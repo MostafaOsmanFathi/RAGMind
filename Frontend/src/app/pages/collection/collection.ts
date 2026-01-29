@@ -1,11 +1,13 @@
-import {Component, ElementRef, inject, OnInit, ViewChild, PLATFORM_ID} from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {ActivatedRoute} from '@angular/router';
-import {DocumentModel} from '../../model/document-model';
-import {ChatRecordModel} from '../../model/chat-record-model';
-import {CollectionService} from '../../services/collection-service';
-import {isPlatformBrowser} from '@angular/common';
-import {catchError, forkJoin, of, finalize, timeout} from 'rxjs';
+import { Component, ElementRef, inject, OnInit, OnDestroy, ViewChild, PLATFORM_ID } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { DocumentModel } from '../../model/document-model';
+import { ChatRecordModel } from '../../model/chat-record-model';
+import { CollectionService } from '../../services/collection-service';
+import { WebsocketService } from '../../services/websocket-service';
+import { isPlatformBrowser } from '@angular/common';
+import { catchError, of, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-collection',
@@ -15,19 +17,23 @@ import {catchError, forkJoin, of, finalize, timeout} from 'rxjs';
   templateUrl: './collection.html',
   styleUrl: './collection.scss',
 })
-export class Collection implements OnInit {
+export class Collection implements OnInit, OnDestroy {
   collectionName = "Collection";
   messageInput = "";
   private shouldScroll = true;
   private collectionId: number | null = null;
   private collectionService = inject(CollectionService);
+  private websocketService = inject(WebsocketService);
   private platformId = inject(PLATFORM_ID);
+  private askResultSub: Subscription | null = null;
+  private connectionStateSub: Subscription | null = null;
   isLoading = true;
   loadError: string | null = null;
+  wsConnected = false;
 
   @ViewChild("messagesContainer") messagesContainer!: ElementRef<HTMLDivElement>;
   documents: DocumentModel[] = [];
-  chatMessages: ChatRecordModel[] = []
+  chatMessages: ChatRecordModel[] = [];
 
   constructor(private route: ActivatedRoute) {
   }
@@ -46,62 +52,99 @@ export class Collection implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.askResultSub?.unsubscribe();
+    this.askResultSub = null;
+    this.connectionStateSub?.unsubscribe();
+    this.connectionStateSub = null;
+    this.websocketService.disconnect();
+  }
+
+  private startWebSocketSession(): void {
+    this.askResultSub?.unsubscribe();
+    this.connectionStateSub?.unsubscribe();
+    this.websocketService.connect();
+    this.askResultSub = this.websocketService.askResult$.subscribe((msg) => {
+      this.chatMessages = [...this.chatMessages, msg];
+      this.shouldScroll = true;
+    });
+    this.connectionStateSub = this.websocketService.connectionState$.subscribe((state) => {
+      this.wsConnected = state === 'connected';
+    });
+  }
+
   loadCollectionData(): void {
     if (this.collectionId === null) return;
     this.isLoading = true;
     this.loadError = null;
 
-    forkJoin({
-      collection: this.collectionService.getCollectionById(this.collectionId).pipe(
-        timeout(15000),
-        catchError(err => {
-          console.error('Error loading collection info', err);
-          return of({ name: 'Collection' } as any);
-        })
-      ),
-      documents: this.collectionService.getDocuments(this.collectionId).pipe(
-        timeout(15000),
-        catchError(err => {
-          console.error('Error loading documents', err);
-          return of([]);
-        })
-      ),
-      history: this.collectionService.getChatHistory(this.collectionId).pipe(
-        timeout(15000),
-        catchError(err => {
-          console.error('Error loading chat history', err);
-          return of([]);
-        })
-      )
-    }).pipe(
-      timeout(20000),
-      finalize(() => this.isLoading = false)
+    // Load collection first; show UI as soon as it completes so we never block forever on documents/history.
+    this.collectionService.getCollectionById(this.collectionId).pipe(
+      timeout(15000),
+      catchError(err => {
+        console.error('Error loading collection info', err);
+        return of({ id: this.collectionId!, name: 'Collection', documentCount: 0, description: '' });
+      })
     ).subscribe({
-      next: (results) => {
+      next: (collection) => {
         this.loadError = null;
-        this.collectionName = results.collection.name || 'Collection';
-        this.documents = results.documents.map(d => ({
-          id: d.id,
-          name: d.fileName || d.name,
-          size: d.size || 'Unknown',
-          uploadedAt: d.uploadedAt || 'Unknown',
-          status: d.status || 'indexed'
-        }));
-        this.chatMessages = results.history.map(h => ({
-          id: h.id,
-          role: h.role,
-          content: h.content,
-          timestamp: h.timestamp || new Date().toLocaleTimeString()
-        }));
-        this.shouldScroll = true;
+        this.isLoading = false;
+        this.collectionName = collection.name || 'Collection';
+        this.startWebSocketSession();
+        this.loadDocumentsAndHistory();
       },
       error: (err) => {
-        console.error('Critical error loading collection data', err);
+        console.error('Critical error loading collection', err);
+        this.isLoading = false;
         this.loadError = err?.name === 'TimeoutError'
           ? 'Request timed out. Check that the API is running at the configured URL.'
           : 'Failed to load collection. Check your connection and that the API is reachable.';
       }
     });
+  }
+
+  private loadDocumentsAndHistory(): void {
+    if (this.collectionId === null) return;
+
+    this.collectionService.getDocuments(this.collectionId).pipe(
+      timeout(15000),
+      catchError(err => {
+        console.error('Error loading documents', err);
+        return of([]);
+      })
+    ).subscribe(docs => {
+      this.documents = (Array.isArray(docs) ? docs : []).map(d => ({
+        id: d.id,
+        name: d.docName ?? d.fileName ?? d.name ?? 'Document',
+        size: d.size ?? 'Unknown',
+        uploadedAt: d.addedDate ? this.formatDate(d.addedDate) : 'Unknown',
+        status: (d.status ?? 'indexed') as 'indexed' | 'processing' | 'error'
+      }));
+    });
+
+    this.collectionService.getChatHistory(this.collectionId).pipe(
+      timeout(15000),
+      catchError(err => {
+        console.error('Error loading chat history', err);
+        return of([]);
+      })
+    ).subscribe(history => {
+      this.chatMessages = (Array.isArray(history) ? history : []).map(h => ({
+        id: String(h.id ?? ''),
+        role: (h.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+        content: h.message ?? h.content ?? '',
+        timestamp: h.date ? this.formatDate(h.date) : (h.timestamp ?? new Date().toLocaleTimeString())
+      }));
+      this.shouldScroll = true;
+    });
+  }
+
+  private formatDate(value: string | Date): string {
+    if (typeof value === 'string') {
+      const d = new Date(value);
+      return isNaN(d.getTime()) ? value : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return value.toLocaleTimeString?.([], { hour: '2-digit', minute: '2-digit' }) ?? String(value);
   }
 
   ngAfterViewChecked() {
@@ -147,26 +190,17 @@ export class Collection implements OnInit {
     this.messageInput = "";
     this.shouldScroll = true;
 
+    // Backend returns "Ask task sent successfully"; the AI answer arrives via WebSocket (/user/queue/ask-result).
     this.collectionService.askQuestion(this.collectionId, { question }).subscribe({
-      next: (response) => {
-        const assistantMessage: ChatRecordModel = {
-          id: response.id || ("msg-" + Date.now()),
-          role: "assistant",
-          content: response.answer || response.content,
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        };
-        this.chatMessages.push(assistantMessage);
-        this.shouldScroll = true;
+      next: () => {
+        // Answer will be pushed to chatMessages by WebsocketService.askResult$ subscription.
       },
       error: (err) => {
         console.error('Error asking question', err);
         const errorMessage: ChatRecordModel = {
           id: "msg-" + Date.now(),
           role: "assistant",
-          content: "Sorry, I encountered an error while processing your request.",
+          content: "Sorry, I couldn't send your question. Check your connection and try again.",
           timestamp: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",

@@ -23,33 +23,39 @@ export class CollectionService {
   }
 
   private getHeaders(): HttpHeaders {
-    const user = this.authService.currentUserValue;
-    const token = user?.accessToken;
+    let token: string | null = this.authService.currentUserValue?.accessToken ?? null;
+    if (!token && typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const userJson = localStorage.getItem('currentUser');
+        if (userJson) {
+          const user = JSON.parse(userJson);
+          token = user?.accessToken ?? null;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    if (!token) return new HttpHeaders();
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     });
   }
 
-  getAllCollections(limit: number = 5, page: number = 0): Observable<CollectionModel[]> {
+  getAllCollections(): Observable<CollectionModel[]> {
     if (!isPlatformBrowser(this.platformId)) {
-      return of([]);
-    }
-
-    const user = this.authService.currentUserValue;
-    if (!user || !user.accessToken) {
       return of([]);
     }
 
     return this.http.get<any[]>(this.apiUrl, {
       headers: this.getHeaders(),
-      params: { limit: limit.toString(), page: page.toString() }
     }).pipe(
-      map(collections => collections.map(c => this.mapToCollectionModel(c)))
+      map(collections => Array.isArray(collections) ? collections.map(c => this.mapToCollectionModel(c)) : [])
     );
   }
 
-  refreshCollections(limit: number = 5, page: number = 0): Observable<CollectionModel[]> {
-    return this.getAllCollections(limit, page).pipe(
+  refreshCollections(): Observable<CollectionModel[]> {
+    return this.getAllCollections().pipe(
       tap(collections => this.collectionsSubject.next(collections))
     );
   }
@@ -95,8 +101,8 @@ export class CollectionService {
   private mapToCollectionModel(c: any): CollectionModel {
     return {
       id: c.id,
-      name: c.collectionName,
-      documentCount: c.numberOfDocs,
+      name: c.collectionName ?? '',
+      documentCount: c.numberOfDocs ?? 0,
       description: ''
     };
   }
@@ -148,10 +154,9 @@ export class CollectionService {
     );
   }
 
-  // Queries / Chat (RagQueryController)
-  // Note: Backend uses plural 'collections' for queries
+
   private queryApiUrl(collectionId: string | number) {
-    return `${this.baseUrl}/rag/collections/${collectionId}/queries`;
+    return `${this.baseUrl}/rag/collection/${collectionId}/queries`;
   }
 
   askQuestion(collectionId: string | number, questionData: any): Observable<any> {

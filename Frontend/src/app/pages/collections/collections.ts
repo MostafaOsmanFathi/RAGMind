@@ -40,7 +40,7 @@ export class Collections implements OnInit, OnDestroy {
     if (!isPlatformBrowser(this.platformId)) return;
     this.loadError = null;
     this.isLoading = true;
-    this.collectionService.refreshCollections(20).pipe(
+    this.collectionService.refreshCollections().pipe(
       timeout(15000),
       finalize(() => this.isLoading = false)
     ).subscribe({

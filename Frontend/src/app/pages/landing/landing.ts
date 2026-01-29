@@ -13,15 +13,15 @@ import {AsyncPipe} from '@angular/common';
 })
 export class Landing {
   isAuthenticated$;
-  numberOfCollections: number = 0;
-  numberOfDocuments: number = 0;
-  lastActivity: string="ff";
+  currentUser$;
+
 
   constructor(
     private router: Router,
     private authService: AuthService
   ) {
     this.isAuthenticated$ = this.authService.isAuthenticated$;
+    this.currentUser$ = this.authService.currentUser$;
   }
 
   getStarted() {

@@ -1,22 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ProfileModel} from '../../model/profile-model';
 import {AuthService} from '../../services/auth-service';
+import {UserService} from '../../services/user-service';
 import {Router} from '@angular/router';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-settings',
+  standalone: true,
   imports: [
-    FormsModule
+    FormsModule,
+    CommonModule
   ],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
-export class Settings {
+export class Settings implements OnInit {
   profileData: ProfileModel = {
-    name: "John Doe",
-    email: "john@example.com",
-    bio: "A passionate developer exploring RAG technology",
+    name: "",
+    email: "",
+    bio: "",
   };
 
   passwordData = {
@@ -30,37 +34,103 @@ export class Settings {
     analytics: false,
   };
 
+  message = "";
+  isError = false;
+
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {}
 
+  ngOnInit() {
+    this.fetchUserProfile();
+  }
+
+  fetchUserProfile() {
+    this.userService.getMe().subscribe({
+      next: (user) => {
+        this.profileData = {
+          name: user.name,
+          email: user.email,
+          bio: user.bio || ""
+        };
+      },
+      error: (err) => {
+        this.showMessage("Failed to fetch profile info", true);
+        console.error(err);
+      }
+    });
+  }
+
   saveProfile() {
-    // TODO: Call backend API to save profile
-    console.log("Profile saved:", this.profileData);
+    this.userService.updateUser(this.profileData).subscribe({
+      next: (updatedUser) => {
+        this.showMessage("Profile updated successfully");
+        this.authService.updateCurrentUser(updatedUser);
+      },
+      error: (err) => {
+        this.showMessage(err.error?.message || "Failed to update profile", true);
+      }
+    });
   }
 
   changePassword() {
     if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
-      console.error("Passwords do not match");
+      this.showMessage("Passwords do not match", true);
       return;
     }
-    // TODO: Call backend API to change password
-    console.log("Password changed");
-    this.passwordData = {
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
+
+    const request = {
+      oldPassword: this.passwordData.currentPassword,
+      newPassword: this.passwordData.newPassword
     };
+
+    this.userService.changePassword(request).subscribe({
+      next: () => {
+        this.showMessage("Password updated successfully");
+        this.passwordData = {
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        };
+      },
+      error: (err) => {
+        this.showMessage(err.error?.message || "Failed to update password", true);
+      }
+    });
   }
 
   savePreferences() {
-    // TODO: Call backend API to save preferences
+    // TODO: Call backend API to save preferences if endpoint exists
+    this.showMessage("Preferences saved successfully");
     console.log("Preferences saved:", this.preferences);
+  }
+
+  deleteAccount() {
+    if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      this.userService.deleteUser().subscribe({
+        next: () => {
+          this.authService.logout();
+          this.router.navigate(["/"]);
+        },
+        error: (err) => {
+          this.showMessage(err.error?.message || "Failed to delete account", true);
+        }
+      });
+    }
   }
 
   logout() {
     this.authService.logout();
     this.router.navigate(["/"]);
+  }
+
+  private showMessage(msg: string, isError: boolean = false) {
+    this.message = msg;
+    this.isError = isError;
+    setTimeout(() => {
+      this.message = "";
+    }, 3000);
   }
 }

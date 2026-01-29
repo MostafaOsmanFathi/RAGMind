@@ -1,6 +1,6 @@
 export interface CollectionModel {
-  id: String,
-  name: String,
-  description: String,
-  documentCount: number,
+  id: number;
+  name: string;
+  description?: string;
+  documentCount: number;
 }

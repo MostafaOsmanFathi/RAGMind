@@ -9,7 +9,7 @@
   </div>
 
   <div class="relative z-10">
-    @if (isAuthenticated$ && false) {
+    @if (isAuthenticated$ | async) {
       <div class="container-custom py-20 md:py-32">
         <div class="text-center max-w-4xl mx-auto">
           <h1 class="text-5xl md:text-6xl font-bold mb-6">

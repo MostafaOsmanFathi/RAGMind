@@ -1,11 +1,12 @@
 import {Component} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {AuthService} from '../../services/auth-service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
   selector: 'app-landing',
   imports: [
-    RouterLink
+    RouterLink, AsyncPipe
   ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',

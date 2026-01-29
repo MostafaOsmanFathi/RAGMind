@@ -25,7 +25,7 @@
         Home
       </a>
 
-      @if (isAuthenticated$) {
+      @if (isAuthenticated$ | async) {
         <a
           routerLink="/collections"
           routerLinkActive="text-accent-cyan"

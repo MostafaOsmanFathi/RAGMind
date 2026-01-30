@@ -5,64 +5,65 @@ services:
       - "80:80"
       - "443:443"
     networks:
-      temp_network:
+      - reverse-proxy-tier
     volumes:
-     - reverse-proxy-cache:/var/cache/nginx
+      - reverse-proxy-cache:/var/cache/nginx
     depends_on:
       - frontend
       - rag-backend
+
   rag-service:
     build:
       context: RagService/.
     environment:
-      CHROMADB_PERSISTENT_CLIENT_PATH: '/app/chromadb/data'
-      SHARED_STORAGE_FILE_PATH: '/app/shared/files'
+      CHROMADB_PERSISTENT_CLIENT_PATH: "/app/chromadb/data"
+      SHARED_STORAGE_FILE_PATH: "/app/shared/files"
       RABBITMQ_USER: guest
       RABBITMQ_PASSWORD: guest
       OLLAMA_URL: http://ollama:11434/
       RABBITMQ_HOST: rabbitmq
       PYTHONUNBUFFERED: 1
-
     networks:
-      - temp_network
+      - rag-tier
+      - rabbitmq-tier
     volumes:
       - shared_volume:/app/shared/files
       - chromadb_volume:/app/chromadb/data
     depends_on:
       - rabbitmq
+      - rag-backend
 
   frontend:
     build: Frontend/.
     networks:
-      - temp_network
+      - reverse-proxy-tier
 
   ollama:
     build: Ollama/.
     networks:
-      - temp_network
+      - rag-tier
+      - ollama-net
     volumes:
       - ollama_volume:/root/.ollama
 
   rabbitmq:
     build: Rabbitmq/.
-    ports:
-      - "5672:5672"
-      - "15672:15672"
     networks:
-      - temp_network
+      - rabbitmq-tier
     volumes:
       - rabbitmq_volume:/var/lib/rabbitmq
 
   rag-backend:
     build: RagBackend/.
-    ports:
-      - "8080:8080"
     networks:
-      - temp_network
+      - reverse-proxy-tier
+      - backend-tier
+      - rabbitmq-tier
     volumes:
       - shared_volume:/app/shared/files
     depends_on:
       - rabbitmq
+
   pg_database:
     build:
       context: Database/.
@@ -70,12 +71,10 @@ services:
         POSTGRES_DB: ragdb
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: admin_password
-
     volumes:
       - pg_volume:/var/lib/postgresql/data
     networks:
-      - temp_network
-    
+      - backend-tier
 
 volumes:
   chromadb_volume:
@@ -85,6 +84,12 @@ volumes:
   pg_volume:
   reverse-proxy-cache:
 
-
 networks:
-  temp_network:
+  reverse-proxy-tier:
+  backend-tier:
+    internal: true
+  rag-tier:
+    internal: true
+  rabbitmq-tier:
+    internal: true
+  ollama-net:

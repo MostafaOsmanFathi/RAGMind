@@ -7,12 +7,24 @@ import { AuthService } from './auth-service';
 import { WS_BASE_URL } from '../config/api-config';
 import { ChatRecordModel } from '../model/chat-record-model';
 
-/** Payload shape for messages received on /user/queue/ask-result (backend-dependent). */
-export interface AskResultPayload {
-  id?: string;
-  content?: string;
-  answer?: string;
+/** Payload from backend /user/queue/ask-result (RagFeedbackResponseDto). collection_name is the collection id. */
+export interface RagFeedbackResponsePayload {
+  backend_id?: string;
+  user_id?: string;
+  status?: string;
+  llm_model?: string;
+  /** Collection id (e.g. "552" for /collections/552). */
+  collection_name?: string;
+  /** The AI response text. */
+  response?: string;
+  taskId?: string;
   [key: string]: unknown;
+}
+
+/** Emitted so the collection page can filter by collection id and append the message. */
+export interface AskResultMessage {
+  collectionId: number;
+  record: ChatRecordModel;
 }
 
 @Injectable({
@@ -24,12 +36,12 @@ export class WebsocketService {
   private platformId = inject(PLATFORM_ID);
 
   private client: Client | null = null;
-  private askResultSubject = new Subject<ChatRecordModel>();
+  private askResultSubject = new Subject<AskResultMessage>();
   private connectionStateSubject = new Subject<'connected' | 'disconnected' | 'error'>();
   private askResultSubscription: { unsubscribe: () => void } | null = null;
 
-  /** Emits each AI answer as it arrives on /user/queue/ask-result. */
-  get askResult$(): Observable<ChatRecordModel> {
+  /** Emits each AI answer with its collection id so the collection page can filter and append. */
+  get askResult$(): Observable<AskResultMessage> {
     return this.askResultSubject.asObservable();
   }
 
@@ -57,7 +69,9 @@ export class WebsocketService {
       return;
     }
 
-    const socket = new SockJS(this.wsBaseUrl);
+    const wsUrl = this.wsBaseUrl;
+    console.debug('[WebSocket] Connecting to', wsUrl);
+    const socket = new SockJS(wsUrl);
     this.client = new Client({
       webSocketFactory: () => socket,
       debug: (msg) => console.debug('[STOMP]', msg),
@@ -68,14 +82,15 @@ export class WebsocketService {
     });
 
     this.client.onConnect = () => {
+      console.debug('[WebSocket] STOMP connected');
       this.connectionStateSubject.next('connected');
       this.askResultSubscription = this.client!.subscribe(
         '/user/queue/ask-result',
         (message) => {
           try {
-            const body = message.body ? JSON.parse(message.body) : {};
-            const record = this.mapAskResultToChatRecord(body);
-            if (record) this.askResultSubject.next(record);
+            const body: RagFeedbackResponsePayload = message.body ? JSON.parse(message.body) : {};
+            const out = this.mapRagFeedbackToAskResult(body);
+            if (out) this.askResultSubject.next(out);
           } catch (e) {
             console.error('[WebSocket] Failed to parse ask-result', e);
           }
@@ -83,8 +98,17 @@ export class WebsocketService {
       );
     };
 
-    this.client.onStompError = () => {
+    this.client.onStompError = (frame: { headers?: { message?: string }; toString?: () => string }) => {
+      console.error('[WebSocket] STOMP error', frame.headers?.message ?? frame.toString?.() ?? frame);
       this.connectionStateSubject.next('error');
+    };
+
+    this.client.onWebSocketClose = (ev: CloseEvent) => {
+      console.warn('[WebSocket] Socket closed', ev.code, ev.reason || '');
+    };
+
+    this.client.onWebSocketError = (ev: Event) => {
+      console.error('[WebSocket] Socket error', ev);
     };
 
     this.client.onDisconnect = () => {
@@ -107,15 +131,18 @@ export class WebsocketService {
     this.connectionStateSubject.next('disconnected');
   }
 
-  private mapAskResultToChatRecord(payload: AskResultPayload): ChatRecordModel | null {
-    const content =
-      payload.content ?? payload.answer ?? (typeof payload === 'string' ? payload : null);
+  private mapRagFeedbackToAskResult(payload: RagFeedbackResponsePayload): AskResultMessage | null {
+    const content = payload.response ?? payload['content'] ?? payload['answer'] ?? (typeof payload === 'string' ? payload : null);
     if (content == null) return null;
-    return {
-      id: payload.id ?? `msg-${Date.now()}`,
+    const rawId = payload.collection_name;
+    const collectionId = rawId != null ? parseInt(String(rawId), 10) : NaN;
+    if (isNaN(collectionId)) return null;
+    const record: ChatRecordModel = {
+      id: payload.taskId ?? payload.backend_id ?? `msg-${Date.now()}`,
       role: 'assistant',
       content: String(content),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
+    return { collectionId, record };
   }
 }

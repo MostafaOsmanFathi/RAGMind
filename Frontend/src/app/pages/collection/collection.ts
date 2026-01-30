@@ -104,10 +104,8 @@ export class Collection implements OnInit, AfterViewChecked, OnDestroy {
               this.isLoading = false;
               this.collectionName = collection.name || 'Collection';
               this.loadDocumentsAndHistory();
-
-              //TODO debug websockets
-              // this.startWebSocketSession();
-              // this.cdr.detectChanges();
+              this.startWebSocketSession();
+              this.cdr.detectChanges();
             });
           }),
         );
@@ -161,8 +159,9 @@ export class Collection implements OnInit, AfterViewChecked, OnDestroy {
     this.websocketService.connect();
 
     this.askResultSub = this.websocketService.askResult$.subscribe((msg) => {
+      if (msg.collectionId !== this.collectionId) return;
       this.ngZone.run(() => {
-        this.chatMessages = [...this.chatMessages, msg];
+        this.chatMessages = [...this.chatMessages, msg.record];
         this.shouldScroll = true;
         this.cdr.detectChanges();
       });
@@ -316,7 +315,7 @@ export class Collection implements OnInit, AfterViewChecked, OnDestroy {
         const errorMessage: ChatRecordModel = {
           id: "msg-" + Date.now(),
           role: "assistant",
-          content: "Sorry, I couldn't send your question. Check your connection and try again.",
+          content: `Sorry, I couldn't send your question. Check your connection and try again,\n because of ${err.message()}`,
           timestamp: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",

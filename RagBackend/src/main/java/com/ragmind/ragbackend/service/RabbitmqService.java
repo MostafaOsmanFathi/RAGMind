@@ -32,7 +32,15 @@ public class RabbitmqService {
 
     public void sendAskTask(AskRabbitmqRequestDto askRabbitmqRequestDto, Authentication authentication) {
         CollectionChat collectionChat = chatService.saveMessage(askRabbitmqRequestDto.getQuestion(), "user", Long.valueOf(askRabbitmqRequestDto.getCollectionName()));
+
         CollectionChatDTO collectionChatDTO = chatService.toDto(collectionChat);
+        askRabbitmqRequestDto.setUserId(authentication.getName());
+        //TODO get static Backend id from docker
+        askRabbitmqRequestDto.setBackendId("backend-1");
+        askRabbitmqRequestDto.setEmbedModel("nomic-embed-text");
+        askRabbitmqRequestDto.setLlmModel("mistral");
+        askRabbitmqRequestDto.setTaskId(collectionChat.getId().toString());
+
         ragRabbitmqProducer.sendAskTask(askRabbitmqRequestDto);
         webSocketService.syncUserMessages(authentication.getName(), collectionChatDTO);
     }

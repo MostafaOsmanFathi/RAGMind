@@ -1,0 +1,70 @@
+<div class="min-h-screen bg-bg-primary flex items-center justify-center px-4 py-20">
+  <!-- Floating Background Orb -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div
+      class="absolute -bottom-40 -left-40 w-96 h-96 rounded-full opacity-10 blur-3xl animate-float-delayed-1"
+      style="background: radial-gradient(circle, rgb(168, 85, 247) 0%, transparent 70%)"
+    ></div>
+  </div>
+
+  <!-- Create Collection Card -->
+  <div class="relative z-10 w-full max-w-md">
+    <div class="card-glass p-8 md:p-10">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <div class="flex justify-center mb-4">
+          <div class="w-16 h-16 bg-gradient-button rounded-2xl flex items-center justify-center text-3xl">
+            📚
+          </div>
+        </div>
+        <h1 class="text-3xl font-bold text-text-primary mb-2">New Collection</h1>
+        <p class="text-text-secondary">Create a new space for your documents</p>
+      </div>
+
+      <!-- Form -->
+      <form (ngSubmit)="onSubmit()" #createForm="ngForm" class="space-y-6">
+        <!-- Collection Name -->
+        <div>
+          <label for="collectionName" class="block text-sm font-medium text-text-primary mb-2">
+            Collection Name
+          </label>
+          <input
+            id="collectionName"
+            type="text"
+            name="collectionName"
+            [(ngModel)]="collectionName"
+            required
+            class="w-full px-4 py-2 rounded-lg bg-bg-secondary bg-opacity-50 border border-border-dark border-opacity-50 text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-cyan focus:border-opacity-100 transition-colors"
+            placeholder="e.g., Project X Research"
+          />
+        </div>
+
+        <!-- Error Message -->
+        @if (error) {
+          <div class="p-3 rounded-lg bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 text-red-400 text-sm">
+            {{ error }}
+          </div>
+        }
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ isLoading ? "Creating..." : "Create Collection" }}
+        </button>
+      </form>
+
+      <!-- Footer -->
+      <div class="text-center mt-8">
+        <a
+          routerLink="/collections"
+          class="text-text-secondary hover:text-text-primary transition-colors flex items-center justify-center gap-2 text-sm"
+        >
+          ← Cancel and go back
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

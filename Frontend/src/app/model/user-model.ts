@@ -5,4 +5,6 @@ export interface UserModel {
   phoneNumber?: string;
   accessToken?: string;
   refreshToken?: string;
+  collectionCount?: number;
+  documentCount?: number;
 }

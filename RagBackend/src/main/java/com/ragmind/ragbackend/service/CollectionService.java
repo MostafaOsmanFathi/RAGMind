@@ -40,10 +40,9 @@ public class CollectionService {
     }
 
 
-    public List<CollectionDto> getAllCollection(String email, int limit, int skip) {
-        int page = skip / limit;
-        var result = collectionRepository.findByUser_Email(email, PageRequest.of(page, limit));
-        return result.getContent().stream().map(Collection::toDto).toList();
+    public List<CollectionDto> getAllCollection(String email) {
+        List<Collection> result = collectionRepository.findByUser_Email(email);
+        return result.stream().map(Collection::toDto).toList();
     }
 
     public CollectionDto getCollectionById(Long collectionId) {
@@ -110,6 +109,7 @@ public class CollectionService {
                         ? 1
                         : collection.getNumberOfDocs() + 1
         );
+        collectionRepository.save(collection);
 
         DocumentRabbitmqRequestDto rabbitmqRequestDto = new DocumentRabbitmqRequestDto();
         rabbitmqRequestDto.setAction("add");

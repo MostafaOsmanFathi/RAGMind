@@ -23,4 +23,12 @@ public class AskRabbitmqRequestDto extends RagInitDto {
     public void setOptions(Map<String, Object> options) {
         this.options = options;
     }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 }

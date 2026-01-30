@@ -8,13 +8,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
     Page<Collection> findByUser(User user, Pageable pageable);
 
-    Page<Collection> findByUser_Email(String userEmail, Pageable pageable);
+    List<Collection> findByUser_Email(String userEmail);
 
     @Override
     Optional<Collection> findById(Long id);

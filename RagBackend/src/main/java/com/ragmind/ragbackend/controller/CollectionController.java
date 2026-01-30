@@ -23,13 +23,10 @@ class CollectionController {
     }
 
     @GetMapping({"/", ""})
-    ResponseEntity<List<CollectionDto>> getAllUserCollections(Authentication authentication,
-                                                              @RequestParam(name = "limit", defaultValue = "5") int limit,
-                                                              @RequestParam(name = "page", defaultValue = "0") int page
-    ) {
+    ResponseEntity<List<CollectionDto>> getAllUserCollections(Authentication authentication) {
         try {
             String email = authentication.getName();
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(collectionService.getAllCollection(email, limit, page));
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(collectionService.getAllCollection(email));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(List.of());
         }
@@ -58,7 +55,8 @@ class CollectionController {
     ResponseEntity<String> deleteCollection(@PathVariable String collectionId, Authentication authentication) {
 
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body("\"message\":successful");
+            collectionService.deleteCollection(Long.valueOf(collectionId));
+            return ResponseEntity.status(HttpStatus.OK).body("\"message\":successful");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("\"message\":Error");
         }

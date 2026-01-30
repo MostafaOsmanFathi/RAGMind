@@ -1,7 +1,7 @@
 import {CanActivateFn, Router} from '@angular/router';
 import {inject, PLATFORM_ID} from '@angular/core';
 import {AuthService} from '../services/auth-service';
-import {map, take} from 'rxjs';
+import {map, take, switchMap, of} from 'rxjs';
 import {isPlatformServer} from '@angular/common';
 
 export const authGuardGuard: CanActivateFn = (route, state) => {
@@ -15,13 +15,16 @@ export const authGuardGuard: CanActivateFn = (route, state) => {
 
   return authService.isAuthenticated$.pipe(
     take(1),
-    map(isAuthenticated => {
-      if (isAuthenticated) {
-        return true;
-      } else {
-        router.navigate(['/login']);
-        return false;
-      }
+    switchMap(isAuthenticated => {
+      if (isAuthenticated) return of(true);
+      return authService.tryRefreshFromStoredToken().pipe(
+        take(1),
+        map(success => {
+          if (success) return true;
+          router.navigate(['/login']);
+          return false;
+        })
+      );
     })
   );
 };

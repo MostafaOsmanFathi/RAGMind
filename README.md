@@ -72,7 +72,10 @@ It allows users to upload documents and ask questions, with responses generated 
   * [RagBackend README](./RagBackend/README.md)
   * [RagService README](./RagService/README.md)
   * [ReverseProxy README](./ReverseProxy/README.md)
-  * [RabbitMQ README](./RabbitMQ/README.md)
+  * [Frontend README](./Frontend/README.md)
+  * [RabbitMQ README](./Rabbitmq/README.md)
+  * [Database README](./Database/README.md)
+  * [Ollama README](./Ollama/README.md)
 
 ## Usage
 

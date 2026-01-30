@@ -2,116 +2,183 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CSS Custom Properties for Design System */
+/* ========== RAG Color Palette ========== */
+/* Dark theme (default) */
 :root {
-  --primary-bg: 14 19 27;
-  --secondary-bg: 28 38 54;
-  --accent-cyan: 6 182 212;
-  --accent-purple: 168 85 247;
-  --accent-pink: 236 72 153;
-  --text-primary: 255 255 255;
-  --text-secondary: 148 163 184;
-  --border-dark: 35 47 67;
+  /* Backgrounds */
+  --bg-main: 15 26 22;
+  --bg-card: 22 35 29;
+  --bg-muted: 30 45 38;
+  /* Text */
+  --text-primary: 230 236 232;
+  --text-secondary: 169 183 175;
+  --text-muted: 111 128 119;
+  /* Border */
+  --border: 38 54 46;
+  /* Primary (Sage) */
+  --primary: 111 175 149;
+  --primary-hover: 79 127 106;
+  /* Secondary (Futuristic Blue) */
+  --secondary: 143 164 255;
+  --secondary-hover: 108 140 245;
+  /* Accent (Sand Gold) */
+  --accent: 227 183 120;
+  --accent-soft: 191 160 99;
+  /* States */
+  --success: 95 179 162;
+  --warning: 226 169 59;
+  --error: 212 106 106;
+}
+
+/* Light theme */
+html.light {
+  /* Backgrounds */
+  --bg-main: 246 248 245;
+  --bg-card: 255 255 255;
+  --bg-muted: 233 238 233;
+  /* Text */
+  --text-primary: 31 42 36;
+  --text-secondary: 95 111 102;
+  --text-muted: 138 155 145;
+  /* Border */
+  --border: 220 227 221;
+  /* Primary (Sage) */
+  --primary: 79 127 106;
+  --primary-hover: 62 107 88;
+  /* Secondary (Futuristic Blue) */
+  --secondary: 108 140 245;
+  --secondary-hover: 88 118 214;
+  /* Accent (Sand Gold) */
+  --accent: 227 183 120;
+  --accent-soft: 243 230 201;
+  /* States */
+  --success: 95 179 162;
+  --warning: 226 169 59;
+  --error: 212 106 106;
+}
+
+/* Smooth theme transition */
+html {
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* Global Base Styles */
 html,
 body {
-  @apply m-0 p-0 bg-bg-primary text-text-primary;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-  sans-serif;
+  @apply m-0 p-0 bg-bg-main text-text-primary;
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Animations */
+/* ========== Animations ========== */
 @keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px) translateX(0px);
-  }
-  25% {
-    transform: translateY(-20px) translateX(10px);
-  }
-  50% {
-    transform: translateY(-40px) translateX(-10px);
-  }
-  75% {
-    transform: translateY(-20px) translateX(15px);
-  }
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-20px) translateX(10px); }
+  50% { transform: translateY(-40px) translateX(-10px); }
+  75% { transform: translateY(-20px) translateX(15px); }
 }
 
 @keyframes float-delayed-1 {
-  0%,
-  100% {
-    transform: translateY(0px) translateX(0px);
-  }
-  25% {
-    transform: translateY(-25px) translateX(-15px);
-  }
-  50% {
-    transform: translateY(-45px) translateX(10px);
-  }
-  75% {
-    transform: translateY(-25px) translateX(-10px);
-  }
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-25px) translateX(-15px); }
+  50% { transform: translateY(-45px) translateX(10px); }
+  75% { transform: translateY(-25px) translateX(-10px); }
 }
 
 @keyframes float-delayed-2 {
-  0%,
-  100% {
-    transform: translateY(0px) translateX(0px);
-  }
-  25% {
-    transform: translateY(-15px) translateX(20px);
-  }
-  50% {
-    transform: translateY(-35px) translateX(-15px);
-  }
-  75% {
-    transform: translateY(-15px) translateX(10px);
-  }
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-15px) translateX(20px); }
+  50% { transform: translateY(-35px) translateX(-15px); }
+  75% { transform: translateY(-15px) translateX(10px); }
 }
 
 @keyframes pulse-custom {
-  0%,
-  100% {
-    opacity: 1;
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
   }
-  50% {
-    opacity: 0.5;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgb(var(--secondary) / 0.2); }
+  50% { box-shadow: 0 0 40px rgb(var(--secondary) / 0.4); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes border-glow {
+  0%, 100% { border-color: rgb(var(--secondary) / 0.3); }
+  50% { border-color: rgb(var(--secondary) / 0.7); }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes stagger-1 { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes stagger-2 { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes stagger-3 { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
 /* Component Classes */
 @layer components {
-  /* Glassmorphic Card */
   .card-glass {
-    @apply rounded-card border border-border-dark border-opacity-50 bg-bg-secondary bg-opacity-40 backdrop-blur-md;
+    @apply rounded-card border border-border-default border-opacity-50 bg-bg-card bg-opacity-90 backdrop-blur-md transition-all duration-300;
   }
 
-  /* Gradient Button */
   .btn-gradient {
-    @apply px-6 py-3 rounded-lg font-semibold bg-gradient-button text-white transition-transform duration-300 hover:scale-105 active:scale-95;
+    @apply px-6 py-3 rounded-lg font-semibold bg-primary-default text-white transition-all duration-300 hover:bg-primary-hover hover:scale-105 hover:shadow-lg hover:shadow-primary-default/20 active:scale-95;
   }
 
-  /* Primary Button */
   .btn-primary {
     @apply btn-gradient;
   }
 
-  /* Secondary Button */
   .btn-secondary {
-    @apply px-6 py-3 rounded-lg font-semibold border border-border-dark border-opacity-100 text-text-primary transition-colors duration-300 hover:bg-bg-secondary hover:bg-opacity-50;
+    @apply px-6 py-3 rounded-lg font-semibold border border-border-default border-opacity-100 text-text-primary transition-all duration-300 hover:bg-bg-muted hover:bg-opacity-50 hover:border-primary-default/50;
   }
 
-  /* Gradient Text */
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-hero;
   }
 
-  /* Floating Animation Utilities */
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
@@ -124,14 +191,43 @@ body {
     animation: float-delayed-2 7s ease-in-out infinite;
   }
 
-  /* Pulsing Indicator */
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.4s ease-out forwards;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.4s ease-out forwards;
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 2.5s ease-in-out infinite;
+  }
+
+  .animate-delay-100 { animation-delay: 100ms; }
+  .animate-delay-200 { animation-delay: 200ms; }
+  .animate-delay-300 { animation-delay: 300ms; }
+  .animate-delay-400 { animation-delay: 400ms; }
+  .animate-delay-500 { animation-delay: 500ms; }
+
   .pulse-indicator {
-    @apply inline-block w-2 h-2 rounded-full bg-accent-cyan;
+    @apply inline-block w-2 h-2 rounded-full bg-primary-default;
     animation: pulse-custom 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
-  /* Container with Padding */
   .container-custom {
     @apply w-full max-w-7xl mx-auto px-4 md:px-8;
+  }
+
+  /* Card hover: primary tint */
+  .card-glass-hover {
+    @apply card-glass hover:border-primary-default/40 hover:shadow-lg hover:shadow-primary-default/10;
   }
 }

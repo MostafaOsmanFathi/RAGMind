@@ -1,6 +1,6 @@
-<div class="min-h-screen bg-bg-primary py-8 px-4">
+<div class="min-h-screen bg-bg-main py-8 px-4">
   <div class="container-custom">
-    <div class="mb-8">
+    <div class="mb-8 animate-fade-in-up">
       <h1 class="text-4xl font-bold text-text-primary mb-2">{{ collectionName }}</h1>
       <p class="text-text-secondary">Upload documents and chat with your content</p>
     </div>
@@ -8,7 +8,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
       @if (isLoading) {
         <div class="col-span-full flex flex-col items-center justify-center py-20">
-          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-cyan mb-4"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-default mb-4"></div>
           <p class="text-text-secondary animate-pulse">Loading collection data...</p>
         </div>
       } @else if (loadError) {
@@ -19,12 +19,12 @@
           <button class="btn-primary" (click)="loadCollectionData()">Retry</button>
         </div>
       } @else {
-        <div class="lg:col-span-1 flex flex-col">
-          <div class="card-glass p-6 flex flex-col h-full">
+        <div class="lg:col-span-1 flex flex-col animate-fade-in-up animate-delay-100">
+          <div class="card-glass card-glass-hover p-6 flex flex-col h-full transition-all duration-300">
             <h2 class="text-xl font-semibold text-text-primary mb-4">Documents</h2>
 
             <div (click)="fileInput.click()"
-                 class="border-2 border-dashed border-border-dark border-opacity-50 rounded-lg p-6 text-center mb-6 cursor-pointer hover:border-accent-cyan transition-colors">
+                 class="border-2 border-dashed border-border-default border-opacity-50 rounded-lg p-6 text-center mb-6 cursor-pointer hover:border-secondary-default transition-colors">
               <div class="text-4xl mb-2">📤</div>
               <p class="text-sm text-text-secondary mb-1">Drag and drop or click to upload</p>
               <p class="text-xs text-text-muted">PDF, TXT, DOCX up to 10MB</p>
@@ -33,7 +33,7 @@
 
             <div class="space-y-3 flex-1 overflow-y-auto">
               @for (doc of documents; track doc.id) {
-                <div class="p-3 bg-bg-secondary bg-opacity-30 rounded-lg">
+                <div class="p-3 bg-bg-muted bg-opacity-50 rounded-lg">
                   <div class="flex items-start justify-between mb-2">
                     <div class="flex-1">
                       <p class="text-text-primary font-medium text-sm">{{ doc.name }}</p>
@@ -41,9 +41,9 @@
                     </div>
                     <div class="flex-shrink-0 ml-2">
                       @switch (doc.status) {
-                        @case ('indexed') { <span class="inline-block w-2 h-2 rounded-full bg-accent-cyan"></span> }
+                        @case ('indexed') { <span class="inline-block w-2 h-2 rounded-full bg-success"></span> }
                         @case ('processing') { <span class="pulse-indicator"></span> }
-                        @case ('error') { <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span> }
+                        @case ('error') { <span class="inline-block w-2 h-2 rounded-full bg-error"></span> }
                       }
                     </div>
                   </div>
@@ -59,12 +59,12 @@
           </div>
         </div>
 
-        <div class="lg:col-span-2 flex flex-col">
-          <div class="card-glass p-6 flex-1 flex flex-col">
+        <div class="lg:col-span-2 flex flex-col animate-fade-in-up animate-delay-200">
+          <div class="card-glass card-glass-hover p-6 flex-1 flex flex-col transition-all duration-300">
             <h2 class="text-xl font-semibold text-text-primary mb-4 flex items-center gap-2">
               Chat
               @if (wsConnected) {
-                <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-accent-cyan bg-opacity-20 text-accent-cyan">Live</span>
+                <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-primary-default/20 text-primary-default">Live</span>
               }
             </h2>
 
@@ -73,14 +73,14 @@
                 <div class="flex gap-3">
                   @if (msg.role === 'user') {
                     <div class="w-full flex justify-end">
-                      <div class="bg-accent-cyan bg-opacity-20 border border-accent-cyan border-opacity-30 rounded-lg p-3 max-w-xs">
+                      <div class="bg-primary-default/20 border border-primary-default/30 rounded-lg p-3 max-w-xs">
                         <p class="text-text-primary text-sm">{{ msg.content }}</p>
                         <p class="text-text-muted text-xs mt-1">{{ msg.timestamp }}</p>
                       </div>
                     </div>
                   } @else {
                     <div class="w-full flex justify-start">
-                      <div class="bg-bg-secondary bg-opacity-50 border border-border-dark border-opacity-50 rounded-lg p-3 max-w-xs">
+                      <div class="bg-bg-card border border-border-default border-opacity-50 rounded-lg p-3 max-w-xs">
                         <p class="text-text-primary text-sm">{{ msg.content }}</p>
                         <p class="text-text-muted text-xs mt-1">{{ msg.timestamp }}</p>
                       </div>
@@ -101,7 +101,7 @@
                 [(ngModel)]="messageInput"
                 (keyup.enter)="sendMessage()"
                 placeholder="Ask something about your documents..."
-                class="flex-1 px-4 py-2 rounded-lg bg-bg-secondary bg-opacity-50 border border-border-dark border-opacity-50 text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-cyan focus:border-opacity-100 transition-colors"
+                class="flex-1 px-4 py-2 rounded-lg bg-bg-card bg-opacity-50 border border-border-default border-opacity-50 text-text-primary placeholder-text-muted focus:outline-none focus:border-secondary-default focus:border-opacity-100 transition-colors"
               />
               <button (click)="sendMessage()" class="btn-primary px-6">Send</button>
             </div>

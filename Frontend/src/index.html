@@ -1,17 +1,34 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Frontend</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <!-- Polyfill for packages (e.g. sockjs-client) that expect Node's global in the browser -->
-  <script>
-    if (typeof global === 'undefined') { window.global = window; }
-  </script>
+    <meta charset="utf-8">
+    <title>RAGMind</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="manifest" href="/manifest.webmanifest" crossOrigin="use-credentials">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#4F7F6A">
+    <meta name="application-name" content="RAGMind">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RAGMind">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+          rel="stylesheet">
+    <!-- Polyfill for packages (e.g. sockjs-client) that expect Node's global in the browser -->
+    <script>
+        if (typeof global === 'undefined') {
+            window.global = window;
+        }
+    </script>
 </head>
 <body>
-  <app-root></app-root>
+<app-root></app-root>
 </body>
 </html>

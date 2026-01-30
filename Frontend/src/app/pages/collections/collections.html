@@ -1,6 +1,6 @@
-<div class="min-h-screen bg-bg-primary py-12 px-4">
+<div class="min-h-screen bg-bg-main py-12 px-4">
   <div class="container-custom">
-    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-12">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-12 animate-fade-in-up">
       <div>
         <h1 class="text-4xl font-bold text-text-primary mb-2">My Collections</h1>
         <p class="text-text-secondary">Manage your document collections and chats</p>
@@ -13,7 +13,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       @if (isLoading) {
         <div class="col-span-full flex flex-col items-center justify-center py-20">
-          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-cyan mb-4"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-default mb-4"></div>
           <p class="text-text-secondary animate-pulse">Loading collections...</p>
         </div>
       } @else if (loadError) {
@@ -24,24 +24,25 @@
           <button class="btn-primary" (click)="loadCollections()">Retry</button>
         </div>
       } @else {
-        @for (collection of collectionsData; track collection.id) {
+        @for (collection of collectionsData; track collection.id; let i = $index) {
           <a
             [routerLink]="'/collections/'+collection.id"
-            class="card-glass p-6 cursor-pointer transition-transform duration-300 hover:scale-105 hover:bg-opacity-60"
+            class="card-glass card-glass-hover p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02] animate-fade-in-up"
+            [style.animation-delay]="(i * 80) + 'ms'"
           >
             <div class="flex items-start justify-between mb-4">
               <div>
                 <h3 class="text-xl font-semibold text-text-primary">{{ collection.name }}</h3>
                 <p class="text-text-muted text-sm">Collection</p>
               </div>
-              <span class="w-10 h-10 bg-gradient-button rounded-lg flex items-center justify-center text-xl">
-                📚
+              <span class="w-10 h-10 bg-gradient-button rounded-lg flex items-center justify-center shrink-0">
+                <img src="/favicon-48x48.png" alt="" width="48" height="48" class="w-8 h-8 object-contain" />
               </span>
             </div>
 
             <p class="text-text-secondary text-sm mb-4">{{ collection.description }}</p>
 
-            <div class="flex items-center justify-between pt-4 border-t border-border-dark border-opacity-30">
+            <div class="flex items-center justify-between pt-4 border-t border-border-default border-opacity-30">
               <div class="flex items-center gap-2">
                 <span class="text-2xl">📄</span>
                 <span class="text-text-muted text-sm">{{ collection.documentCount }} documents</span>

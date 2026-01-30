@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-bg-primary flex items-center justify-center px-4 py-20">
+<div class="min-h-screen bg-bg-main flex items-center justify-center px-4 py-20">
   <!-- Floating Background Orb -->
   <div class="absolute inset-0 pointer-events-none overflow-hidden">
     <div
@@ -8,13 +8,19 @@
   </div>
 
   <!-- Create Collection Card -->
-  <div class="relative z-10 w-full max-w-md">
-    <div class="card-glass p-8 md:p-10">
+  <div class="relative z-10 w-full max-w-md animate-scale-in">
+    <div class="card-glass card-glass-hover p-8 md:p-10 transition-all duration-300">
       <!-- Header -->
       <div class="text-center mb-8">
         <div class="flex justify-center mb-4">
-          <div class="w-16 h-16 bg-gradient-button rounded-2xl flex items-center justify-center text-3xl">
-            📚
+          <div class="w-16 h-16 bg-gradient-button rounded-2xl flex items-center justify-center">
+            <img
+              src="/android-chrome-192x192.png"
+              alt="RAGMind"
+              width="192"
+              height="192"
+              class="w-16 h-16 object-contain"
+            />
           </div>
         </div>
         <h1 class="text-3xl font-bold text-text-primary mb-2">New Collection</h1>
@@ -34,14 +40,14 @@
             name="collectionName"
             [(ngModel)]="collectionName"
             required
-            class="w-full px-4 py-2 rounded-lg bg-bg-secondary bg-opacity-50 border border-border-dark border-opacity-50 text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-cyan focus:border-opacity-100 transition-colors"
+            class="w-full px-4 py-2 rounded-lg bg-bg-card bg-opacity-50 border border-border-default border-opacity-50 text-text-primary placeholder-text-muted focus:outline-none focus:border-secondary-default focus:border-opacity-100 transition-colors"
             placeholder="e.g., Project X Research"
           />
         </div>
 
         <!-- Error Message -->
         @if (error) {
-          <div class="p-3 rounded-lg bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 text-red-400 text-sm">
+          <div class="p-3 rounded-lg bg-error/10 border border-error/30 text-error text-sm">
             {{ error }}
           </div>
         }

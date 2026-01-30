@@ -2,6 +2,7 @@ from .llm_models.MistralLLM import MistralLLM
 from .prompts.DefaultPrompt import DefaultPrompt
 from .vectordb.ChromadbManger import ChromadbManger
 from .embade_functions.NomicEmbed import NomicEmbed
+from collections import Counter
 
 
 class RagSystem:
@@ -10,7 +11,7 @@ class RagSystem:
                  embedding_fun = NomicEmbed().embedding_fn,
                  llm_model=MistralLLM(),
                 prompt_manger=DefaultPrompt(),
-                 n_results_query:int=6):
+                 n_results_query:int=3):
 
         self.embedding_fun = embedding_fun or NomicEmbed().embedding_fn
         self.vectordb=ChromadbManger(db_collection_name,n_results_query,self.embedding_fun)
@@ -35,9 +36,14 @@ class RagSystem:
 
             all_queries = expanded_queries + hypothetical_queries
             all_chunks = []
-            for q in all_queries:
-                chunks = self.vectordb.query_document(q)  # single string per query
-                all_chunks.extend(chunks)
+
+            #TODO fix Context Window limit to big context
+            # for q in all_queries:
+            #     chunks = self.vectordb.query_document(q)  # single string per query
+            #     all_chunks.extend(chunks)
+
+            chunks = self.vectordb.query_document('\n'.join(all_queries))
+            all_chunks.extend(chunks)
 
             unique_chunks = list(dict.fromkeys(all_chunks))
             context = "\n".join(unique_chunks)

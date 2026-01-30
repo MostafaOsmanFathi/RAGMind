@@ -1,4 +1,12 @@
-# RAGMind
+<p align="center">
+  <img src="docs/favicon.svg" alt="RAGMind Logo" width="96" />
+</p>
+
+<h1 align="center">RAGMind</h1>
+
+<p>
+  A private-document chat assistant powered by Retrieval-Augmented Generation (RAG)
+</p>
 
 ## Project Overview
 

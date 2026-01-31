@@ -63,6 +63,7 @@ services:
       - shared_volume:/app/shared/files
     depends_on:
       - rabbitmq
+      - pg_database
 
   pg_database:
     build:

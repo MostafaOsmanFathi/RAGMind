@@ -4,7 +4,7 @@ from langchain_chroma import Chroma
 from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 
 from RagService.rag_langchain_core.configs.configBase import ConfigBase
-
+from RagService.rag_langchain_core.prompt_templates import default_prompts
 
 class RagChainsCreator:
     def __init__(self,config:ConfigBase,collection_name:str):
@@ -31,7 +31,23 @@ class RagChainsCreator:
                 | RunnableLambda(self._config.add_documents_to_store)
         )
 
-    def get_retrival_chain(self,number_of_results:int):
-        return self._vector_store.as_retriever(search_kwargs={"k": number_of_results})
+    def get_retrival_chain(self,num_retrival_results:int):
+        return self._vector_store.as_retriever(search_kwargs={"k": num_retrival_results})
 
+
+
+    def ask_rag_chain(self,num_retrival_results=2,expand_query_by=3):
+        return (
+            {
+                "question": RunnablePassthrough(),
+                "context":
+                    RunnablePassthrough()
+                    | RunnableLambda(lambda q:{'question':q,'expand_by':expand_query_by})
+                    | default_prompts.query_expansion_prompt | self._config.llm
+                    | RunnableLambda(lambda result: {'questions':result.content})
+                    | default_prompts.hallucination_answers_prompt | self._config.llm
+                    | RunnableLambda(lambda result: result.content)
+                    | self.get_retrival_chain(num_retrival_results)
+            }| default_prompts.answer_context_prompt
+        )|self._config.llm
 

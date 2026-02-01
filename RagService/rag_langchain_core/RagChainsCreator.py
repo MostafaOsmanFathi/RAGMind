@@ -43,9 +43,9 @@ class RagChainsCreator:
                 "context":
                     RunnablePassthrough()
                     | RunnableLambda(lambda q:{'question':q,'expand_by':expand_query_by})
-                    | default_prompts.query_expansion_prompt | self._config.llm
+                    | default_prompts.query_expansion_prompt | self._config.small_llm
                     | RunnableLambda(lambda result: {'questions':result.content})
-                    | default_prompts.hallucination_answers_prompt | self._config.llm
+                    | default_prompts.hallucination_answers_prompt | self._config.small_llm
                     | RunnableLambda(lambda result: result.content)
                     | self.get_retrival_chain(num_retrival_results)
             }| default_prompts.answer_context_prompt

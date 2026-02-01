@@ -10,10 +10,14 @@ from langchain_text_splitters import TextSplitter
 
 
 class ConfigBase(ABC):
-    def __init__(self,llm:BaseChatModel,embeddings:Embeddings,text_splitter:TextSplitter):
+    def __init__(self,llm:BaseChatModel,embeddings:Embeddings,text_splitter:TextSplitter,small_llm:BaseChatModel=None):
         self.llm = llm
         self.embeddings = embeddings
         self.text_splitter = text_splitter
+        self.small_llm = small_llm
+
+        if self.small_llm is None:
+            self.small_llm = llm
 
     def generate_file_id(self,file_path: str) -> str:
         """

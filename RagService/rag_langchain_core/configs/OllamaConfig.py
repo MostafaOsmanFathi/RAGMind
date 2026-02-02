@@ -16,7 +16,9 @@ class OllamaConfig(ConfigBase):
                          base_url=os.getenv('OLLAMA_URL','http://localhost:11434/')
                          )
 
-        embeddings = OllamaEmbeddings(model=embed_name)
+        embeddings = OllamaEmbeddings(model=embed_name,
+                                      base_url=os.getenv('OLLAMA_URL', 'http://localhost:11434/')
+        )
 
 
         if small_llm is not None:

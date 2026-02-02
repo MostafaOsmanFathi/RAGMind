@@ -1,7 +1,7 @@
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_text_splitters import TokenTextSplitter
 
-from configBase import ConfigBase
+from .configBase import ConfigBase
 
 #TODO need to be tested
 class OllamaCloudConfig(ConfigBase):

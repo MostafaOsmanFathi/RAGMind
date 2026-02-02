@@ -3,7 +3,7 @@ import os
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_text_splitters import TokenTextSplitter
 
-from configBase import ConfigBase
+from .configBase import ConfigBase
 
 class OllamaConfig(ConfigBase):
     def __init__(self, model_name:str='mistral',embed_name='nomic-embed-text',validate_model_on_init:bool=True,small_llm:str='phi3'):

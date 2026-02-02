@@ -2,7 +2,7 @@ import sys
 
 from dotenv import load_dotenv
 load_dotenv(verbose=False)
-from RagSystem.workers_listener import start_listener
+from .RagSystem.workers_listener import start_listener
 
 
 def main():

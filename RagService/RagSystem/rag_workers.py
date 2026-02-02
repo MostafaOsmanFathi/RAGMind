@@ -9,25 +9,19 @@ from .prompts.DefaultPrompt import DefaultPrompt
 from .rabbitmq_utils.exchanges import RABBITMQ_HOST
 from .rabbitmq_utils.feedback import send_rag_feedback, send_doc_feedback
 from .rabbitmq_utils.message_models import RAGWorkerMessage, RAGFeedback, DocumentWorkerMessage, RagInit, DocFeedback
-from ..rag_langchain_core.RagChainsCreator import RagChainsCreator
-from ..rag_langchain_core.configs.OllamaConfig import OllamaConfig
+
+from ..rag_langchain_core import RagChainsCreator
+from ..rag_langchain_core import OllamaConfig
+
+
 
 
 def get_rag(message:RagInit):
-    # select embedding function
     if message.embed_model in (None, "nomic-embed-text"):
-        embedding_fun = NomicEmbed().embedding_fn
         embed_model_name = "nomic-embed-text"
     else:
         raise ValueError(f"Unsupported embed model: {message.embed_model}")
 
-    # # select LLM
-    # if message.llm_model == "mistral":
-    #     llm_model = MistralLLM()
-    # elif message.llm_model == "phi3":
-    #     llm_model = Phi3LLM()
-    # else:
-    #     raise ValueError(f"Unsupported LLM model: {message.llm_model}")
 
     config=OllamaConfig(model_name=message.llm_model,
                  embed_name=message.embed_model,

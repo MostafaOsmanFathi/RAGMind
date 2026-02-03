@@ -29,6 +29,8 @@ The system has **two main worker threads**, each handling a separate type of tas
 
 ### 1. RAG Ask Flow
 
+![Ask Flow](../docs/Query-Chain.webp)
+
 1. Listen to the RabbitMQ queue for RAG query tasks.
 2. Upon receiving a task:
 
@@ -39,6 +41,8 @@ The system has **two main worker threads**, each handling a separate type of tas
    * Send the response back via the RabbitMQ feedback exchanger.
 
 ### 2. Document Task Flow
+
+![Add Document](../docs/Add-Doc-Chain.webp)
 
 1. Listen to a separate RabbitMQ queue for document ingestion tasks.
 2. Upon receiving a task:

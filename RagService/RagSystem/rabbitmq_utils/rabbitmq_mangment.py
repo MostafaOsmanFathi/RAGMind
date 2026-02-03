@@ -4,11 +4,7 @@ import pika
 from pika.exceptions import AMQPConnectionError
 
 from .exchanges import (
-    DOC_TOPIC_EXCHANGE_WORKER,
-    RAG_TOPIC_EXCHANGE_WORKER,
     EXCHANGE_TYPE_TOPIC_WORKER,
-    DOC_QUEUE_WORKER,
-    RAG_QUEUE_WORKER,
     RABBITMQ_HOST,
     RABBITMQ_USER,
     RABBITMQ_PASSWORD,

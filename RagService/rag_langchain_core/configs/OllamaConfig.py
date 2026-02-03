@@ -1,0 +1,32 @@
+import os
+
+from langchain_ollama import ChatOllama, OllamaEmbeddings
+from langchain_text_splitters import TokenTextSplitter
+
+from .configBase import ConfigBase
+
+class OllamaConfig(ConfigBase):
+    def __init__(self, model_name:str='mistral',embed_name='nomic-embed-text',validate_model_on_init:bool=True,small_llm:str='phi3'):
+        text_splitter = TokenTextSplitter(chunk_size=500, chunk_overlap=100)
+
+        llm = ChatOllama(model=model_name,
+                         validate_model_on_init=validate_model_on_init,
+                         temperature=.8,
+                         num_predict=512,
+                         base_url=os.getenv('OLLAMA_URL','http://localhost:11434/')
+                         )
+
+        embeddings = OllamaEmbeddings(model=embed_name,
+                                      base_url=os.getenv('OLLAMA_URL', 'http://localhost:11434/')
+        )
+
+
+        if small_llm is not None:
+            small_llm= ChatOllama(model=small_llm,
+                                  validate_model_on_init=validate_model_on_init,
+                                  temperature=.8,
+                                  num_predict=256,
+                                  base_url=os.getenv('OLLAMA_URL', 'http://localhost:11434/')
+                                  )
+
+        super().__init__(llm,embeddings,text_splitter,small_llm)

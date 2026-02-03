@@ -11,6 +11,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
+COPY prebuild_tiktoken.py .
+RUN python prebuild_tiktoken.py
+
 COPY . ./RagService
 
 

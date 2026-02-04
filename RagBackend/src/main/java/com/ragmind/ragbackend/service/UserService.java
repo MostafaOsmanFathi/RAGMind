@@ -9,7 +9,6 @@ import com.ragmind.ragbackend.dto.request.UserSignupRequest;
 import com.ragmind.ragbackend.dto.response.GenerateAccessTokenResponse;
 import com.ragmind.ragbackend.dto.response.LoginResponse;
 import com.ragmind.ragbackend.dto.response.SignupResponse;
-import com.ragmind.ragbackend.entity.Collection;
 import com.ragmind.ragbackend.entity.User;
 import com.ragmind.ragbackend.repository.UserRepository;
 import jakarta.validation.ValidationException;
@@ -147,6 +146,17 @@ public class UserService {
     public void deleteUser(String email) {
         User user = getUserByEmail(email);
         userRepository.delete(user);
+    }
+
+    public void removeUserRefreshToken(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        user.setRefreshToken("");
+        userRepository.save(user);
+    }
+
+    public boolean isUserEnabled(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return user.isUserEnabled();
     }
 
     private UserDTO toDto(User user) {

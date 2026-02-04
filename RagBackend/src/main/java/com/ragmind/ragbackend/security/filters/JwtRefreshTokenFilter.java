@@ -1,11 +1,14 @@
 package com.ragmind.ragbackend.security.filters;
 
 import com.ragmind.ragbackend.service.JwtService;
+import com.ragmind.ragbackend.service.TokenBlockService;
+import com.ragmind.ragbackend.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,9 +21,13 @@ import java.util.List;
 @Component
 public class JwtRefreshTokenFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    private final TokenBlockService tokenBlockService;
+    private final UserService userService;
 
-    public JwtRefreshTokenFilter(JwtService jwtService) {
+    public JwtRefreshTokenFilter(JwtService jwtService, TokenBlockService tokenBlockService,@Lazy UserService userService) {
         this.jwtService = jwtService;
+        this.tokenBlockService = tokenBlockService;
+        this.userService = userService;
     }
 
     @Override
@@ -52,6 +59,13 @@ public class JwtRefreshTokenFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write("{\"message\":\"Invalid or expired token\"}");
+                return;
+            }
+            String user = jwtService.extractEmail(token);
+            if (tokenBlockService.checkTokenBlocked(token) || !userService.isUserEnabled(user)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"message\":\"token is blocked try to login again or \"}");
                 return;
             }
 

@@ -77,6 +77,18 @@ services:
     networks:
       - backend-tier
 
+  redis_database:
+    image: redis:8.4.0
+    command: >  
+      redis-server
+        --appendonly yes
+        --appendfilename "appendonly.aof"
+        --appendfsync everysec
+    volumes:
+      - redis-cash:/data
+    networks:
+      - backend-tier
+
 volumes:
   chromadb_volume:
   shared_volume:
@@ -84,6 +96,7 @@ volumes:
   rabbitmq_volume:
   pg_volume:
   reverse-proxy-cache:
+  redis-cash:
 
 networks:
   reverse-proxy-tier:

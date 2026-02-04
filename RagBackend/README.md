@@ -2,7 +2,7 @@
 
 ![Spring Boot](https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/spring-boot-icon.png)
 
-RAGMind is a backend system for managing AI-driven RAG (Retrieval-Augmented Generation) pipelines with user-isolated document storage and real-time WebSocket notifications.
+RAGMind is a backend system for managing AI-driven RAG (Retrieval-Augmented Generation) pipelines with user-isolated document storage, real-time WebSocket notifications, and Redis caching for blocked or logged-out users.
 
 ---
 
@@ -14,6 +14,7 @@ RAGMind supports:
 * **Document Management Tasks**: Uploading and querying documents per user.
 * **Real-time Communication**: WebSocket + STOMP for instant responses and notifications.
 * **Shared Storage Management**: Ensures no path conflicts and secure data isolation for each user.
+* **Redis caching**: Stores blocked or logged-out users to improve authentication checks and security.
 
 ### Architecture Flow
 
@@ -66,6 +67,7 @@ RAGMind supports:
 ### Authentication
 
 * HTTP Bearer token authentication.
+* Redis is used to cache blocked or logged-out users to prevent unauthorized access.
 
 ### Endpoints Overview
 
@@ -92,6 +94,7 @@ RAGMind supports:
 * `POST /auth/signup` - User signup
 * `POST /auth/login` - User login
 * `POST /auth/refreshtoken` - Refresh JWT token
+* `POST /auth/logout` - Logout user and block tokens using Redis cache
 
 ---
 
@@ -106,6 +109,7 @@ RAGMind supports **real-time communication** using WebSocket with the **STOMP pr
 ```
 
 * JWT token required in `Authorization` header
+* Redis is checked to ensure blocked users cannot connect
 
 ### Available Queues
 
@@ -124,9 +128,10 @@ RAGMind supports **real-time communication** using WebSocket with the **STOMP pr
 ### Notes
 
 * JWT ensures only authorized users receive messages.
+* Redis caching prevents blocked or logged-out users from accessing services.
 * Each user receives messages isolated from others.
 * SockJS ensures browser compatibility.
 
 ---
 
-This README provides a **quick-start guide** for developers integrating with RAGMind, including **task flows**, **shared storage management**, **REST API usage**, and **real-time WebSocket integration**.
+This README provides a **quick-start guide** for developers integrating with RAGMind, including **task flows**, **shared storage management**, **REST API usage**, **Redis-backed authentication**, and **real-time WebSocket integration**.

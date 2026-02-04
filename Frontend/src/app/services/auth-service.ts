@@ -67,7 +67,22 @@ export class AuthService {
 
   logout(): void {
     if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem('currentUser');
+      const user = this.currentUserSubject.value;
+      const refreshToken = user?.refreshToken ?? this.getStoredRefreshToken();
+      const headers = { Authorization: `Bearer ${refreshToken}` };
+      this.http.post(`${this.apiUrl}/logout`, {}, { headers })
+          .subscribe({
+            next: () => {
+              console.log('Logged out successfully');
+            },
+            error: (err) => {
+              console.error('Logout failed', err);
+            },
+            complete: () => {
+              this.currentUserSubject.next(null);
+              this.isAuthenticatedSubject.next(false);
+            }
+          });
       this.clearStoredRefreshToken();
     }
     this.currentUserSubject.next(null);

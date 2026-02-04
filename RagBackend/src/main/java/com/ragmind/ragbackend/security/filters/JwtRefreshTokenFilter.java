@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +24,7 @@ public class JwtRefreshTokenFilter extends OncePerRequestFilter {
     private final TokenBlockService tokenBlockService;
     private final UserService userService;
 
-    public JwtRefreshTokenFilter(JwtService jwtService, TokenBlockService tokenBlockService, UserService userService) {
+    public JwtRefreshTokenFilter(JwtService jwtService, TokenBlockService tokenBlockService,@Lazy UserService userService) {
         this.jwtService = jwtService;
         this.tokenBlockService = tokenBlockService;
         this.userService = userService;

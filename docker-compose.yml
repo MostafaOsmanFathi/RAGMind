@@ -79,6 +79,11 @@ services:
 
   redis_database:
     image: redis:8.4.0
+    command: >  
+      redis-server
+        --appendonly yes
+        --appendfilename "appendonly.aof"
+        --appendfsync everysec
     volumes:
       - redis-cash:/data
     networks:

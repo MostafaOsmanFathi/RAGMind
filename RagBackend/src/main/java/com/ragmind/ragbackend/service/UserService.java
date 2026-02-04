@@ -154,6 +154,11 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public boolean isUserEnabled(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return user.isUserEnabled();
+    }
+
     private UserDTO toDto(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());

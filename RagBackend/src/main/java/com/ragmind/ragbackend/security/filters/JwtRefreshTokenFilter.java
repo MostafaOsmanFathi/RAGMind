@@ -1,6 +1,7 @@
 package com.ragmind.ragbackend.security.filters;
 
 import com.ragmind.ragbackend.service.JwtService;
+import com.ragmind.ragbackend.service.TokenBlockService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,9 +19,11 @@ import java.util.List;
 @Component
 public class JwtRefreshTokenFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    private final TokenBlockService tokenBlockService;
 
-    public JwtRefreshTokenFilter(JwtService jwtService) {
+    public JwtRefreshTokenFilter(JwtService jwtService, TokenBlockService tokenBlockService) {
         this.jwtService = jwtService;
+        this.tokenBlockService = tokenBlockService;
     }
 
     @Override
@@ -52,6 +55,13 @@ public class JwtRefreshTokenFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write("{\"message\":\"Invalid or expired token\"}");
+                return;
+            }
+
+            if (tokenBlockService.checkTokenBlocked(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"message\":\"token is blocked try to login again or \"}");
                 return;
             }
 

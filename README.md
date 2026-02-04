@@ -14,6 +14,8 @@ RAGMind is a private-document chat assistant leveraging Retrieval-Augmented Gene
 
 It allows users to upload documents and ask questions, with responses generated from the content of the documents rather than general AI knowledge.
 
+Additionally, blocked or logged-out users are managed via **Redis caching** to ensure efficient token validation and user session handling.
+
 ## Key Features
 
 * Upload and query **text documents** (future support for PDF, DOCX, etc.)
@@ -24,6 +26,7 @@ It allows users to upload documents and ask questions, with responses generated 
 * **LLM inference** with Mistral phi-3
 * Designed for **high concurrency** with Java Spring Boot
 * **JWT Access & Refresh tokens** for secure and efficient user authentication
+* **Redis caching** for blocked or logged-out users
 * **Real-time updates** via WebSocket using STOMP
 
 ## Architecture & Scalability
@@ -34,6 +37,7 @@ It allows users to upload documents and ask questions, with responses generated 
 
   * JWT Access Tokens for quick request validation
   * JWT Refresh Tokens for secure session management
+  * **Redis caching for blocked/unenabled users**
 * Services Overview:
 
   * `rag-backend` – Retrieval + generation API
@@ -42,7 +46,7 @@ It allows users to upload documents and ask questions, with responses generated 
   * `reverse-proxy` – Routes requests to services
   * **Frontend (future)**: Angular-based chat UI
 
-![Architecture Diagram Placeholder](./docs/architecture_diagram.png)
+![Architecture Diagram Placeholder](./docs/architecture_diagram.webp)
 
 ## Tech Stack
 
@@ -54,6 +58,7 @@ It allows users to upload documents and ask questions, with responses generated 
 | Message Broker    | RabbitMQ                                        |
 | Backend           | Java Spring Boot (scalable, JWT Auth) + Python  |
 | Frontend          | Angular (planned)                               |
+| Caching           | Redis (AOF persistence for blocked tokens)      |
 | Containerization  | Docker Compose                                  |
 | API Documentation | [See API Docs](./RagBackend/API.md)             |
 | WebSocket         | [See WebSocket Docs](./RagBackend/WebSocket.md) |
@@ -62,6 +67,7 @@ It allows users to upload documents and ask questions, with responses generated 
 
 * **Docker Compose** based setup for all microservices
 * Services connected via RabbitMQ for async messaging
+* Redis caching configured with **AOF persistence** to store blocked or logged-out tokens
 * Backend APIs documented via **Swagger** ([link to Swagger docs](./RagBackend/API.md))
 * Real-time updates via **WebSocket** ([see docs](./RagBackend/WebSocket.md))
 
@@ -81,6 +87,7 @@ It allows users to upload documents and ask questions, with responses generated 
 
 * Upload **text documents**
 * Ask questions and get answers based on your documents
+* Redis automatically caches **blocked or logged-out users** for fast authentication checks
 * Future updates will support multi-format uploads and a full Angular frontend
 
 ## Future Improvements

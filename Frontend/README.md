@@ -1,4 +1,5 @@
 # RAGMind Frontend
+![anguler](https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/angular-icon.png)
 
 Angular frontend for **RAGMind**: a RAG (Retrieval-Augmented Generation) application for managing document collections and chatting with AI over your data. This document describes the app architecture, authentication (access/refresh tokens), WebSocket usage, and how the pieces fit together.
 

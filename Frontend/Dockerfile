@@ -1,6 +1,12 @@
 FROM node:lts-alpine3.23 AS ngbuild
 
-LABEL authors="MostafaOsman"
+LABEL org.opencontainers.image.authors="Mostafa Osman <mostafa.osman.fathi@gmail.com>" \
+      org.opencontainers.image.source="https://github.com/MostafaOsmanFathi/RAGMind" \
+      org.opencontainers.image.version="v1.10" \
+      org.opencontainers.image.licenses="MIT"
+
+LABEL org.opencontainers.image.title="frontend" \
+      org.opencontainers.image.description="Web frontend application providing user interface for the RAG system"
 
 WORKDIR /app
 

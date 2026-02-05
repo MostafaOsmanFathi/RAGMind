@@ -1,5 +1,13 @@
 FROM python:3.12.12
 
+LABEL org.opencontainers.image.authors="Mostafa Osman <mostafa.osman.fathi@gmail.com>" \
+      org.opencontainers.image.source="https://github.com/MostafaOsmanFathi/RAGMind" \
+      org.opencontainers.image.version="v1.10" \
+      org.opencontainers.image.licenses="MIT"
+
+LABEL org.opencontainers.image.title="rag-service" \
+      org.opencontainers.image.description="RAG processing service responsible for document ingestion, embeddings, and vector storage interaction"
+
 ARG CHROMADB_PATH=/app/chromadb/data/
 
 ARG SHARED_STORAGE_File_PATH=/app/shared/files

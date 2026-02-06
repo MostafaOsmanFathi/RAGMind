@@ -51,4 +51,13 @@ class RagQueryController {
         }
     }
 
+    @GetMapping("/taskId/{taskId}")
+    ResponseEntity<?> checkTaskIDDocument(@PathVariable String collectionId, @PathVariable Long taskId) {
+        try {
+            String result = chatService.checkForTaskId(taskId);
+            return ResponseEntity.status(200).body(Map.of("result", result));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to send document task: " + e.getMessage());
+        }
+    }
 }

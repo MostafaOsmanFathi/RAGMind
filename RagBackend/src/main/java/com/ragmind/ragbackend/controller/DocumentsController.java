@@ -92,4 +92,14 @@ class DocumentsController {
                     .body("Could not save file: " + e.getMessage());
         }
     }
+
+    @GetMapping("/taskId/{taskId}")
+    ResponseEntity<?> checkTaskIDDocument(@PathVariable String collectionId, @PathVariable Long taskId) {
+        try {
+            String response = collectionService.checkTaskId(taskId);
+            return ResponseEntity.status(200).body(Map.of("result", response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }

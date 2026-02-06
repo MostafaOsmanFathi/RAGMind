@@ -71,7 +71,7 @@ public class FeedbackRagConsumer {
 
         ObjectMapper mapper = new ObjectMapper();
         RagFeedbackResponseDto messageObj = mapper.readValue(message, RagFeedbackResponseDto.class);
-        chatService.saveMessage(messageObj.getResponse(), "system", Long.valueOf(messageObj.getCollectionName()));
+        chatService.saveMessage(messageObj.getResponse(), "system", Long.valueOf(messageObj.getCollectionName()), messageObj.getTaskId());
 
         webSocketService.syncUserMessages(messageObj.getUserId(), messageObj);
     };

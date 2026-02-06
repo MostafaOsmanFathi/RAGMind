@@ -101,7 +101,7 @@ public class CollectionService {
         document.setDocName(docName);
         document.setSharedPath(documentPath);
         document.setAddedDate(new Date());
-
+        document.setDocumentStatus("processing");
         CollectionDocuments saved = documentRepository.save(document);
 
         collection.setNumberOfDocs(
@@ -138,4 +138,10 @@ public class CollectionService {
         );
     }
 
+    public String checkTaskId(Long id) throws Exception {
+        CollectionDocuments collectionDocuments = documentRepository.findById(id).orElseThrow();
+        if (collectionDocuments != null)
+            return collectionDocuments.getDocumentStatus();
+        throw new Exception("task id doesn't exists");
+    }
 }

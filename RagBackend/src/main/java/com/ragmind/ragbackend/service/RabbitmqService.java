@@ -31,7 +31,7 @@ public class RabbitmqService {
 
 
     public String sendAskTask(AskRabbitmqRequestDto askRabbitmqRequestDto, Authentication authentication) {
-        CollectionChat collectionChat = chatService.saveMessage(askRabbitmqRequestDto.getQuestion(), "user", Long.valueOf(askRabbitmqRequestDto.getCollectionName()));
+        CollectionChat collectionChat = chatService.saveMessage(askRabbitmqRequestDto.getQuestion(), "user", Long.valueOf(askRabbitmqRequestDto.getCollectionName()),"0");
 
         CollectionChatDTO collectionChatDTO = chatService.toDto(collectionChat);
         askRabbitmqRequestDto.setUserId(authentication.getName());

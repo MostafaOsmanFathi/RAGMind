@@ -92,7 +92,7 @@ public class CollectionService {
         return toDto(document);
     }
 
-    public void addDocument(Long collectionId, String documentPath, String docName, String collectionName, Authentication authentication) {
+    public String addDocument(Long collectionId, String documentPath, String docName, String collectionName, Authentication authentication) {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new IllegalArgumentException("Collection not found"));
 
@@ -125,6 +125,7 @@ public class CollectionService {
         rabbitmqRequestDto.setBackendId("backend-1");
 
         rabbitmqService.sendDocumentTask(rabbitmqRequestDto);
+        return rabbitmqRequestDto.getTaskId();
     }
 
     private CollectionDocumentDto toDto(CollectionDocuments document) {

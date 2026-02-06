@@ -89,6 +89,18 @@ services:
     networks:
       - backend-tier
 
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    environment:
+      WEBHOOK_URL: https://giddying-caryl-unscarved.ngrok-free.dev
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_volume:/home/node/.n8n
+    networks:
+      backend-tier:
+      n8n-net:
+
 volumes:
   chromadb_volume:
   shared_volume:
@@ -97,6 +109,7 @@ volumes:
   pg_volume:
   reverse-proxy-cache:
   redis-cash:
+  n8n_volume:
 
 networks:
   reverse-proxy-tier:
@@ -107,3 +120,4 @@ networks:
   rabbitmq-tier:
     internal: true
   ollama-net:
+  n8n-net:

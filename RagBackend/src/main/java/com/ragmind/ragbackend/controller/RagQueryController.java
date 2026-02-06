@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @SecurityRequirement(name = "bearerAuth")
 @RestController
@@ -32,8 +33,8 @@ class RagQueryController {
     ResponseEntity<?> createQuery(@PathVariable String collectionId, @RequestBody AskRabbitmqRequestDto askRabbitmqRequestDto, Authentication authentication) {
         askRabbitmqRequestDto.setCollectionName(collectionId);
         try {
-            rabbitmqService.sendAskTask(askRabbitmqRequestDto, authentication);
-            return ResponseEntity.ok("Ask task sent successfully");
+            String taskId = rabbitmqService.sendAskTask(askRabbitmqRequestDto, authentication);
+            return ResponseEntity.status(200).body(Map.of("taskId", taskId));
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to send ask task: " + e.getMessage());
         }

@@ -82,7 +82,7 @@ Additionally, blocked or logged-out users are managed via **Redis caching** to e
   * [RabbitMQ README](./Rabbitmq/README.md)
   * [Database README](./Database/README.md)
   * [Ollama README](./Ollama/README.md)
-  * [Ollama README](./n8n/README.md)
+  * [n8n README](./n8n/README.md)
 
 ## Usage
 

@@ -21,7 +21,7 @@ public class ChatService {
         this.collectionRepository = collectionRepository;
     }
 
-    public CollectionChat saveMessage(String message, String role, Long collectionId) {
+    public CollectionChat saveMessage(String message, String role, Long collectionId, String taskId) {
         try {
 
             CollectionChat collectionChat = new CollectionChat();
@@ -30,7 +30,7 @@ public class ChatService {
             collectionChat.setDate(LocalDate.now());
             Collection collection = collectionRepository.findById(collectionId).orElseThrow();
             collectionChat.setCollection(collection);
-
+            collectionChat.setTaskId(taskId);
             collectionChat = collectionChatRepository.save(collectionChat);
 
             return collectionChat;
@@ -64,5 +64,11 @@ public class ChatService {
         );
     }
 
+    public String checkForTaskId(Long taskId) throws Exception {
+        CollectionChat collectionChat = collectionChatRepository.findByTaskId(taskId.toString()).orElseThrow();
+        if (collectionChat != null)
+            return collectionChat.getMessage();
+        throw new Exception("task Id doesn't exists");
+    }
 
 }

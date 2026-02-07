@@ -1,6 +1,7 @@
 package com.ragmind.ragbackend.entity;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -22,6 +23,7 @@ public class CollectionChat {
     private String role;
     private LocalDate date;
     private LocalDateTime createdAt;
+    private String taskId;
 
     public Long getId() {
         return id;
@@ -29,6 +31,14 @@ public class CollectionChat {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public Collection getCollection() {

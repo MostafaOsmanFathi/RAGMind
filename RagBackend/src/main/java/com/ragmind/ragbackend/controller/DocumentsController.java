@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Objects;
 
 @SecurityRequirement(name = "bearerAuth")
@@ -82,13 +83,23 @@ class DocumentsController {
             }
             Path filePath = dirPath.resolve(Objects.requireNonNull(file.getOriginalFilename()));
             file.transferTo(filePath.toFile());
-            collectionService.addDocument(collectionId, filePath.toString(), file.getOriginalFilename(), collectionId.toString(), authentication);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            String taskId = collectionService.addDocument(collectionId, filePath.toString(), file.getOriginalFilename(), collectionId.toString(), authentication);
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("taskId", taskId));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Could not save file: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/taskId/{taskId}")
+    ResponseEntity<?> checkTaskIDDocument(@PathVariable String collectionId, @PathVariable Long taskId) {
+        try {
+            String response = collectionService.checkTaskId(taskId);
+            return ResponseEntity.status(200).body(Map.of("result", response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 }

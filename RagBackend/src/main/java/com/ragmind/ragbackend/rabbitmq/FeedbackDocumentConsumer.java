@@ -6,6 +6,8 @@ import com.ragmind.ragbackend.config.RabbitmqConnectionInitializerConfig;
 import com.ragmind.ragbackend.dto.NotificationDTO;
 import com.ragmind.ragbackend.dto.rabbitmq.DocumentFeedbackResponseDto;
 import com.ragmind.ragbackend.dto.rabbitmq.RagFeedbackResponseDto;
+import com.ragmind.ragbackend.entity.CollectionDocuments;
+import com.ragmind.ragbackend.repository.CollectionDocumentRepository;
 import com.ragmind.ragbackend.service.NotificationService;
 import com.ragmind.ragbackend.service.WebSocketService;
 import jakarta.annotation.PostConstruct;
@@ -23,15 +25,17 @@ public class FeedbackDocumentConsumer {
     private final RabbitmqConnectionInitializerConfig rabbitConfig;
     private WebSocketService webSocketService;
     private NotificationService notificationService;
+    private CollectionDocumentRepository collectionDocumentRepository;
     private Channel channel;
     private final String QUEUE_NAME = "feedback.document.queue";
     private final String EXCHANGE_NAME = "doc_topic_feedback";
     private final String ROUTING_KEY = "doc.#";
 
-    public FeedbackDocumentConsumer(RabbitmqConnectionInitializerConfig rabbitConfig, WebSocketService webSocketService, NotificationService notificationService) {
+    public FeedbackDocumentConsumer(RabbitmqConnectionInitializerConfig rabbitConfig, WebSocketService webSocketService, NotificationService notificationService, CollectionDocumentRepository collectionDocumentRepository) {
         this.rabbitConfig = rabbitConfig;
         this.webSocketService = webSocketService;
         this.notificationService = notificationService;
+        this.collectionDocumentRepository = collectionDocumentRepository;
     }
 
     @PostConstruct
@@ -53,6 +57,12 @@ public class FeedbackDocumentConsumer {
 
         ObjectMapper mapper = new ObjectMapper();
         DocumentFeedbackResponseDto feedback = mapper.readValue(message, DocumentFeedbackResponseDto.class);
+
+        //Save document response
+        CollectionDocuments collectionDocuments = collectionDocumentRepository.findById(Long.valueOf(feedback.getTaskId())).orElseThrow();
+        collectionDocuments.setDocumentStatus(feedback.getStatus());
+        collectionDocumentRepository.save(collectionDocuments);
+
         webSocketService.syncUserMessages(feedback.getUserId(), feedback);
 
         NotificationDTO notificationDTO = new NotificationDTO();

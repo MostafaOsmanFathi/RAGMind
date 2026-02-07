@@ -1,6 +1,7 @@
 package com.ragmind.ragbackend.entity;
 
 import jakarta.persistence.*;
+
 import java.util.Date;
 
 @Entity
@@ -24,12 +25,23 @@ public class CollectionDocuments {
     @Column(name = "added_date")
     private Date addedDate;
 
+    @Column(name = "document_status")
+    private String documentStatus;
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getDocumentStatus() {
+        return documentStatus;
+    }
+
+    public void setDocumentStatus(String documentStatus) {
+        this.documentStatus = documentStatus;
     }
 
     public Collection getCollection() {

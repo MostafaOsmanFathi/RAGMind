@@ -85,6 +85,8 @@ export class AuthService {
           });
       this.clearStoredRefreshToken();
     }
+    localStorage.removeItem('currentUser');
+    this.clearStoredRefreshToken();
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
   }

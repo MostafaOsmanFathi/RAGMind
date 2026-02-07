@@ -1,0 +1,1417 @@
+{
+  "name": "RagMind",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1760,
+        -512
+      ],
+      "id": "94f33877-3151-4fa6-9baa-a561c455e2b2",
+      "name": "Telegram Trigger",
+      "webhookId": "aaf0d0e2-ddb5-4a18-be48-a28d9790b12b",
+      "credentials": {
+        "telegramApi": {
+          "id": "EU9ZZPqTRyCc8D8r",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "20439a97-b5bb-443b-9717-14bef3a58f29",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.document }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        256,
+        -416
+      ],
+      "id": "f173c5e3-75e5-4b6e-8831-76a52ba96daa",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://rag-backend:8080/auth/login",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"email\":\"{{ $('Telegram Trigger').item.json.message.chat.username }}@bot.rag.telegram\",\n\"password\":\"{{ $('Telegram Trigger').item.json.message.from.id }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1312,
+        -416
+      ],
+      "id": "df2b6239-b90c-4cb5-a689-ca3d340d2ca0",
+      "name": "Auth/Login"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://rag-backend:8080/auth/signup",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $('Telegram Trigger').item.json.message.from.first_name }}\",\n  \"email\": \"{{ $('Telegram Trigger').item.json.message.from.username }}@bot.rag.telegram\",\n  \"password\": \"{{ $('Telegram Trigger').item.json.message.from.id }}\",\n  \"phoneNumber\": \"\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1536,
+        -416
+      ],
+      "id": "ac6b12f0-b68e-4f8b-93f9-880696cd8fb5",
+      "name": "Auth/Signup",
+      "retryOnFail": false,
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "maxTries": 2,
+      "waitBetweenTries": 0,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('UserAuthData').item.json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        -512
+      ],
+      "id": "03e02a67-d591-4294-b17f-ae67d578c943",
+      "name": "Get Document",
+      "webhookId": "4d5e541a-94d4-44ee-9437-82acdeb45ea2",
+      "credentials": {
+        "telegramApi": {
+          "id": "EU9ZZPqTRyCc8D8r",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "9g7NycRtfL3tykar",
+          "mode": "list",
+          "cachedResultName": "users",
+          "cachedResultUrl": "/projects/mkY9clvJpYFS8R2m/datatables/9g7NycRtfL3tykar"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $json.email }}",
+            "accessToken": "={{ $json.accessToken }}",
+            "refreshToken": "={{ $json.refreshToken }}",
+            "collectionName": "={{ $json.collectionId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "accessToken",
+              "displayName": "accessToken",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "refreshToken",
+              "displayName": "refreshToken",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "collectionName",
+              "displayName": "collectionName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        -344
+      ],
+      "id": "0f4c96bf-7351-4506-b1c3-c185d57a726e",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c69f0d5d-4224-4ff2-b186-ffb4d7cd41a7",
+              "name": "message",
+              "value": "={{ $('Telegram Trigger').item.json.message }}",
+              "type": "object"
+            },
+            {
+              "id": "50e356d9-82e0-41c0-8f3c-cfae12cab2de",
+              "name": "accessToken",
+              "value": "={{ $('Auth/Login').item.json.accessToken }}",
+              "type": "string"
+            },
+            {
+              "id": "5219f6c4-629b-4259-935b-8e35a9dae5da",
+              "name": "refreshToken",
+              "value": "={{ $('Auth/Login').item.json.refreshToken }}",
+              "type": "string"
+            },
+            {
+              "id": "07762df8-d140-4618-a7b2-8d8ca0d1ae1a",
+              "name": "email",
+              "value": "={{ $('Auth/Login').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "f8ee7eb8-c6b2-4e6c-8229-fc00b1e330a8",
+              "name": "collectionName",
+              "value": "={{ $json.collectionName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        -416
+      ],
+      "id": "d052a508-435d-437d-a6c0-505175563908",
+      "name": "UserAuthData"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://rag-backend:8080/rag/collection",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Auth/Login').item.json.accessToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "collectionName",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.username }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -640,
+        -344
+      ],
+      "id": "605a1474-0c7b-4d80-934b-ea9445f8dea8",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d750a685-f2db-4708-aa3a-9613e41106d5",
+              "leftValue": "={{ $json.values().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -864,
+        -416
+      ],
+      "id": "6fd0d430-f8b7-439e-9fec-a98ccccdc3e2",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "9g7NycRtfL3tykar",
+          "mode": "list",
+          "cachedResultName": "users",
+          "cachedResultUrl": "/projects/mkY9clvJpYFS8R2m/datatables/9g7NycRtfL3tykar"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1088,
+        -416
+      ],
+      "id": "169edec1-440c-44b7-844f-e9c8da8cda19",
+      "name": "Get row(s)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c69f0d5d-4224-4ff2-b186-ffb4d7cd41a7",
+              "name": "message",
+              "value": "={{ $('Telegram Trigger').item.json.message }}",
+              "type": "object"
+            },
+            {
+              "id": "50e356d9-82e0-41c0-8f3c-cfae12cab2de",
+              "name": "accessToken",
+              "value": "={{ $('Auth/Login').item.json.accessToken }}",
+              "type": "string"
+            },
+            {
+              "id": "5219f6c4-629b-4259-935b-8e35a9dae5da",
+              "name": "refreshToken",
+              "value": "={{ $('Auth/Login').item.json.refreshToken }}",
+              "type": "string"
+            },
+            {
+              "id": "07762df8-d140-4618-a7b2-8d8ca0d1ae1a",
+              "name": "email",
+              "value": "={{ $('Auth/Login').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "f8ee7eb8-c6b2-4e6c-8229-fc00b1e330a8",
+              "name": "collectionName",
+              "value": "={{ $json.collectionName }}",
+              "type": "string"
+            },
+            {
+              "id": "5a73502f-5121-49bc-b431-25853c5e8141",
+              "name": "collectionId",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        -344
+      ],
+      "id": "2b09740d-2a0c-4f41-942a-28c1fda44c0a",
+      "name": "UserAuthData1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://rag-backend:8080/rag/collection/{{ $('UserAuthData').item.json.collectionName }}/documents",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer  {{ $('UserAuthData').item.json.accessToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        704,
+        -512
+      ],
+      "id": "3a2a82a3-c467-4ad1-8267-c065bfeb9d59",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=you document with name {{ $('Get Document').item.json.result.file_path }} has been enqueed to backend with this taskID: {{ $json.taskId }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1152,
+        -512
+      ],
+      "id": "e5895eaf-0b8f-4846-a0da-19f108ba33d4",
+      "name": "Send a text message",
+      "webhookId": "abe5dcac-7c2c-4ab0-bc16-ff2dcd089550",
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "EU9ZZPqTRyCc8D8r",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://rag-backend:8080/rag/collections/{{ $json.collectionName }}/queries/ask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer  {{ $('UserAuthData').item.json.accessToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"question\": \"{{ $json.message.text }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        480,
+        -320
+      ],
+      "id": "522b44ca-eff8-4beb-b961-6a71bba74174",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=your question is being proscced with this taskID: {{ $json.taskId }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        -320
+      ],
+      "id": "e2a51ba4-5a99-4afb-9519-d6b498667175",
+      "name": "Send a text message1",
+      "webhookId": "abe5dcac-7c2c-4ab0-bc16-ff2dcd089550",
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "EU9ZZPqTRyCc8D8r",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "A6XHzqRNJNoOfQYk",
+          "mode": "list",
+          "cachedResultName": "Tasks",
+          "cachedResultUrl": "/projects/mkY9clvJpYFS8R2m/datatables/A6XHzqRNJNoOfQYk"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "isDocumentTask": false,
+            "taskId": "={{ $json.taskId }}",
+            "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "email": "={{ $('UserAuthData').item.json.email }}",
+            "password": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+            "collectionId": "={{ $('UserAuthData').item.json.collectionName }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "taskId",
+              "displayName": "taskId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "isDocumentTask",
+              "displayName": "isDocumentTask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "password",
+              "displayName": "password",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "collectionId",
+              "displayName": "collectionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        704,
+        -320
+      ],
+      "id": "56ac3f4c-aa96-4cfb-b67b-1d88644ee69e",
+      "name": "Insert row2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1760,
+        0
+      ],
+      "id": "ac7b1357-092a-45bd-b5b7-2acddd7c20b8",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "A6XHzqRNJNoOfQYk",
+          "mode": "list",
+          "cachedResultName": "Tasks",
+          "cachedResultUrl": "/projects/mkY9clvJpYFS8R2m/datatables/A6XHzqRNJNoOfQYk"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1536,
+        0
+      ],
+      "id": "d6c096ed-df2c-4cb0-8543-45db22fa94f6",
+      "name": "Get row(s)1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c87b01aa-7cc8-43dd-91f8-2c20e80201dc",
+              "leftValue": "={{ $('Get row(s)1').item.json.isDocumentTask }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1088,
+        0
+      ],
+      "id": "6ffab0cd-84af-463e-a158-12913389afac",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Get row(s)1').item.json.chatId }}",
+        "text": "=you document with taskID: {{ $('Get row(s)1').item.json.taskId }} status is: {{ $json.result }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -416,
+        -96
+      ],
+      "id": "feb0fab3-894c-4cde-9551-0469ac6b6904",
+      "name": "Send a text message2",
+      "webhookId": "abe5dcac-7c2c-4ab0-bc16-ff2dcd089550",
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "EU9ZZPqTRyCc8D8r",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "A6XHzqRNJNoOfQYk",
+          "mode": "list",
+          "cachedResultName": "Tasks",
+          "cachedResultUrl": "/projects/mkY9clvJpYFS8R2m/datatables/A6XHzqRNJNoOfQYk"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "isDocumentTask": true,
+            "taskId": "={{ $json.taskId }}",
+            "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "email": "={{ $('UserAuthData').item.json.email }}",
+            "password": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+            "collectionId": "={{ $('UserAuthData').item.json.collectionName }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "taskId",
+              "displayName": "taskId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "isDocumentTask",
+              "displayName": "isDocumentTask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "password",
+              "displayName": "password",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "collectionId",
+              "displayName": "collectionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        928,
+        -512
+      ],
+      "id": "95280f2d-c68d-4460-bea8-6cc6663ce83c",
+      "name": "Insert row1"
+    },
+    {
+      "parameters": {
+        "url": "=http://rag-backend:8080/rag/collection/{{ $('Get row(s)1').item.json.collectionId }}/documents/taskId/{{ $('Get row(s)1').item.json.taskId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "=Authorization",
+              "value": "=Bearer {{ $json.accessToken }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -864,
+        -96
+      ],
+      "id": "35a01934-cd8d-4840-a54a-0d2ebf0313f5",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://rag-backend:8080/auth/login",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"email\":\"{{ $json.email }}\",\n\"password\":\"{{ $json.password }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1312,
+        0
+      ],
+      "id": "e3bd9d3d-d077-47d6-ad0f-76c49a340726",
+      "name": "Auth/Login1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "43328296-52ec-4e9b-89e7-43e85b65e11b",
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "processing",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -640,
+        -96
+      ],
+      "id": "30c83a0c-fe5f-44f3-a7b2-122c3f79d661",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "A6XHzqRNJNoOfQYk",
+          "mode": "list",
+          "cachedResultName": "Tasks",
+          "cachedResultUrl": "/projects/mkY9clvJpYFS8R2m/datatables/A6XHzqRNJNoOfQYk"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get row(s)1').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "f3dfdee9-6d0b-4cbc-9434-b834d719185d",
+      "name": "Delete row(s)"
+    },
+    {
+      "parameters": {
+        "url": "=http://rag-backend:8080/rag/collections/{{ $('Get row(s)1').item.json.collectionId }}/queries/taskId/{{ $('Get row(s)1').item.json.taskId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer  {{ $json.accessToken }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -864,
+        96
+      ],
+      "id": "a3cbc763-29c9-435c-b696-5b24343e4b57",
+      "name": "HTTP Request4",
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d632e1a6-d933-450c-8382-78068f133bb1",
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -640,
+        96
+      ],
+      "id": "7c8400b7-abcf-419a-95cf-04db73a77ce7",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Get row(s)1').item.json.chatId }}",
+        "text": "=you ask query with taskID: {{ $('Get row(s)1').item.json.taskId }} Response is:\n\n{{ $json.result }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -416,
+        96
+      ],
+      "id": "a0e6bfea-6798-4cdd-80b5-d11722e575f8",
+      "name": "Send a text message3",
+      "webhookId": "abe5dcac-7c2c-4ab0-bc16-ff2dcd089550",
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "EU9ZZPqTRyCc8D8r",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "users",
+        "columns": {
+          "column": [
+            {
+              "name": "email"
+            },
+            {
+              "name": "accessToken"
+            },
+            {
+              "name": "refreshToken"
+            },
+            {
+              "name": "collectionName"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1536,
+        -608
+      ],
+      "id": "7e70c14e-5500-4186-a916-7cf786ed2946",
+      "name": "Create a data table",
+      "alwaysOutputData": false,
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "Tasks",
+        "columns": {
+          "column": [
+            {
+              "name": "taskId"
+            },
+            {
+              "name": "isDocumentTask",
+              "type": "boolean"
+            },
+            {
+              "name": "chatId"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "password"
+            },
+            {
+              "name": "collectionId"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1312,
+        -608
+      ],
+      "id": "51069b9e-188d-4e8a-b385-6f28e26b8f5b",
+      "name": "Create a data table1",
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Auth/Signup",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a data table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auth/Login": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auth/Signup": {
+      "main": [
+        [
+          {
+            "node": "Auth/Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get Document",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Document": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "UserAuthData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UserAuthData": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "UserAuthData1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "UserAuthData",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UserAuthData1": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Insert row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Insert row2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)1": {
+      "main": [
+        [
+          {
+            "node": "Auth/Login1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auth/Login1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message2": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message3": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a data table": {
+      "main": [
+        [
+          {
+            "node": "Create a data table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "59628e6f-4adc-42b0-bebb-0118a80e9717",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8e1e222b79af6a380aaf3b1aa1feabacc7faea567855b32d2b70b18b8184cbe3"
+  },
+  "id": "H-qMw5M4ezD57VxGhiqgA",
+  "tags": []
+}

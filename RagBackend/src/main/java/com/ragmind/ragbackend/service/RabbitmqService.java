@@ -30,8 +30,8 @@ public class RabbitmqService {
     }
 
 
-    public void sendAskTask(AskRabbitmqRequestDto askRabbitmqRequestDto, Authentication authentication) {
-        CollectionChat collectionChat = chatService.saveMessage(askRabbitmqRequestDto.getQuestion(), "user", Long.valueOf(askRabbitmqRequestDto.getCollectionName()));
+    public String sendAskTask(AskRabbitmqRequestDto askRabbitmqRequestDto, Authentication authentication) {
+        CollectionChat collectionChat = chatService.saveMessage(askRabbitmqRequestDto.getQuestion(), "user", Long.valueOf(askRabbitmqRequestDto.getCollectionName()),"0");
 
         CollectionChatDTO collectionChatDTO = chatService.toDto(collectionChat);
         askRabbitmqRequestDto.setUserId(authentication.getName());
@@ -43,6 +43,7 @@ public class RabbitmqService {
 
         ragRabbitmqProducer.sendAskTask(askRabbitmqRequestDto);
         webSocketService.syncUserMessages(authentication.getName(), collectionChatDTO);
+        return collectionChat.getId().toString();
     }
 
 }

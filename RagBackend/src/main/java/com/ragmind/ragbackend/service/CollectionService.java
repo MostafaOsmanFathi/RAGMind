@@ -92,7 +92,7 @@ public class CollectionService {
         return toDto(document);
     }
 
-    public void addDocument(Long collectionId, String documentPath, String docName, String collectionName, Authentication authentication) {
+    public String addDocument(Long collectionId, String documentPath, String docName, String collectionName, Authentication authentication) {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new IllegalArgumentException("Collection not found"));
 
@@ -101,7 +101,7 @@ public class CollectionService {
         document.setDocName(docName);
         document.setSharedPath(documentPath);
         document.setAddedDate(new Date());
-
+        document.setDocumentStatus("processing");
         CollectionDocuments saved = documentRepository.save(document);
 
         collection.setNumberOfDocs(
@@ -125,6 +125,7 @@ public class CollectionService {
         rabbitmqRequestDto.setBackendId("backend-1");
 
         rabbitmqService.sendDocumentTask(rabbitmqRequestDto);
+        return rabbitmqRequestDto.getTaskId();
     }
 
     private CollectionDocumentDto toDto(CollectionDocuments document) {
@@ -137,4 +138,10 @@ public class CollectionService {
         );
     }
 
+    public String checkTaskId(Long id) throws Exception {
+        CollectionDocuments collectionDocuments = documentRepository.findById(id).orElseThrow();
+        if (collectionDocuments != null)
+            return collectionDocuments.getDocumentStatus();
+        throw new Exception("task id doesn't exists");
+    }
 }

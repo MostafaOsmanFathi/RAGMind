@@ -1,0 +1,181 @@
+name: Build & Push All Docker Images
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  reverse-proxy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & Push Reverse Proxy
+        uses: docker/build-push-action@v5
+        with:
+          context: ReverseProxy/.
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/reverse-proxy:latest
+            ghcr.io/${{ github.repository }}/reverse-proxy:${{ github.ref_name }}
+
+  rag-service:
+    runs-on: ubuntu-latest
+    needs: [reverse-proxy]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & Push Rag Service
+        uses: docker/build-push-action@v5
+        with:
+          context: RagService/.
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/rag-service:latest
+            ghcr.io/${{ github.repository }}/rag-service:${{ github.ref_name }}
+
+  frontend:
+    runs-on: ubuntu-latest
+    needs: [reverse-proxy]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & Push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: Frontend/.
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/frontend:latest
+            ghcr.io/${{ github.repository }}/frontend:${{ github.ref_name }}
+
+  ollama:
+    runs-on: ubuntu-latest
+    needs: [rag-service]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & Push Ollama
+        uses: docker/build-push-action@v5
+        with:
+          context: Ollama/.
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/ollama:latest
+            ghcr.io/${{ github.repository }}/ollama:${{ github.ref_name }}
+
+  rabbitmq:
+    runs-on: ubuntu-latest
+    needs: [rag-service]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & Push RabbitMQ
+        uses: docker/build-push-action@v5
+        with:
+          context: Rabbitmq/.
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/rabbitmq:latest
+            ghcr.io/${{ github.repository }}/rabbitmq:${{ github.ref_name }}
+
+  rag-backend:
+    runs-on: ubuntu-latest
+    needs: [rabbitmq, pg-database]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & Push Rag Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: RagBackend/.
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/rag-backend:latest
+            ghcr.io/${{ github.repository }}/rag-backend:${{ github.ref_name }}
+
+  pg-database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & Push Postgres
+        uses: docker/build-push-action@v5
+        with:
+          context: Database/.
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/pg-database:latest
+            ghcr.io/${{ github.repository }}/pg-database:${{ github.ref_name }}
+          build-args: |
+            POSTGRES_DB=ragdb
+            POSTGRES_USER=admin
+            POSTGRES_PASSWORD=admin_password
+
+  redis-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull Redis Image
+        run: docker pull redis:8.4.0
+      - name: Tag and Push Redis to GHCR
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker tag redis:8.4.0 ghcr.io/${{ github.repository }}/redis-database:latest
+          docker tag redis:8.4.0 ghcr.io/${{ github.repository }}/redis-database:${{ github.ref_name }}
+          docker push ghcr.io/${{ github.repository }}/redis-database:latest
+          docker push ghcr.io/${{ github.repository }}/redis-database:${{ github.ref_name }}
+
+  n8n:
+    runs-on: ubuntu-latest
+    needs: [rag-backend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & Push n8n
+        uses: docker/build-push-action@v5
+        with:
+          context: n8n/.
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/n8n:latest
+            ghcr.io/${{ github.repository }}/n8n:${{ github.ref_name }}

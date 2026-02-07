@@ -21,8 +21,8 @@ jobs:
           context: ReverseProxy/.
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/reverse-proxy:latest
-            ghcr.io/${{ github.repository }}/reverse-proxy:${{ github.ref_name }}
+            ghcr.io/mostafaosmanfathi/ragmind/reverse-proxy:latest
+            ghcr.io/mostafaosmanfathi/ragmind/reverse-proxy:${{ github.ref_name }}
 
   rag-service:
     runs-on: ubuntu-latest
@@ -41,8 +41,8 @@ jobs:
           context: RagService/.
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/rag-service:latest
-            ghcr.io/${{ github.repository }}/rag-service:${{ github.ref_name }}
+            ghcr.io/mostafaosmanfathi/ragmind/rag-service:latest
+            ghcr.io/mostafaosmanfathi/ragmind/rag-service:${{ github.ref_name }}
 
   frontend:
     runs-on: ubuntu-latest
@@ -61,8 +61,8 @@ jobs:
           context: Frontend/.
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/frontend:latest
-            ghcr.io/${{ github.repository }}/frontend:${{ github.ref_name }}
+            ghcr.io/mostafaosmanfathi/ragmind/frontend:latest
+            ghcr.io/mostafaosmanfathi/ragmind/frontend:${{ github.ref_name }}
 
   ollama:
     runs-on: ubuntu-latest
@@ -81,8 +81,8 @@ jobs:
           context: Ollama/.
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/ollama:latest
-            ghcr.io/${{ github.repository }}/ollama:${{ github.ref_name }}
+            ghcr.io/mostafaosmanfathi/ragmind/ollama:latest
+            ghcr.io/mostafaosmanfathi/ragmind/ollama:${{ github.ref_name }}
 
   rabbitmq:
     runs-on: ubuntu-latest
@@ -101,8 +101,8 @@ jobs:
           context: Rabbitmq/.
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/rabbitmq:latest
-            ghcr.io/${{ github.repository }}/rabbitmq:${{ github.ref_name }}
+            ghcr.io/mostafaosmanfathi/ragmind/rabbitmq:latest
+            ghcr.io/mostafaosmanfathi/ragmind/rabbitmq:${{ github.ref_name }}
 
   rag-backend:
     runs-on: ubuntu-latest
@@ -121,8 +121,8 @@ jobs:
           context: RagBackend/.
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/rag-backend:latest
-            ghcr.io/${{ github.repository }}/rag-backend:${{ github.ref_name }}
+            ghcr.io/mostafaosmanfathi/ragmind/rag-backend:latest
+            ghcr.io/mostafaosmanfathi/ragmind/rag-backend:${{ github.ref_name }}
 
   pg-database:
     runs-on: ubuntu-latest
@@ -140,8 +140,8 @@ jobs:
           context: Database/.
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/pg-database:latest
-            ghcr.io/${{ github.repository }}/pg-database:${{ github.ref_name }}
+            ghcr.io/mostafaosmanfathi/ragmind/pg-database:latest
+            ghcr.io/mostafaosmanfathi/ragmind/pg-database:${{ github.ref_name }}
           build-args: |
             POSTGRES_DB=ragdb
             POSTGRES_USER=admin
@@ -155,10 +155,10 @@ jobs:
       - name: Tag and Push Redis to GHCR
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker tag redis:8.4.0 ghcr.io/${{ github.repository }}/redis-database:latest
-          docker tag redis:8.4.0 ghcr.io/${{ github.repository }}/redis-database:${{ github.ref_name }}
-          docker push ghcr.io/${{ github.repository }}/redis-database:latest
-          docker push ghcr.io/${{ github.repository }}/redis-database:${{ github.ref_name }}
+          docker tag redis:8.4.0 ghcr.io/mostafaosmanfathi/ragmind/redis-database:latest
+          docker tag redis:8.4.0 ghcr.io/mostafaosmanfathi/ragmind/redis-database:${{ github.ref_name }}
+          docker push ghcr.io/mostafaosmanfathi/ragmind/redis-database:latest
+          docker push ghcr.io/mostafaosmanfathi/ragmind/redis-database:${{ github.ref_name }}
 
   n8n:
     runs-on: ubuntu-latest
@@ -177,5 +177,5 @@ jobs:
           context: n8n/.
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/n8n:latest
-            ghcr.io/${{ github.repository }}/n8n:${{ github.ref_name }}
+            ghcr.io/mostafaosmanfathi/ragmind/n8n:latest
+            ghcr.io/mostafaosmanfathi/ragmind/n8n:${{ github.ref_name }}

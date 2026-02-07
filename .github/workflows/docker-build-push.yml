@@ -14,7 +14,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ GHCR_PAT }}
+          password: ${{ secrets.GHCR_PAT }}
       - name: Build & Push Reverse Proxy
         uses: docker/build-push-action@v5
         with:
@@ -34,7 +34,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ GHCR_PAT }}
+          password: ${{ secrets.GHCR_PAT }}
       - name: Build & Push Rag Service
         uses: docker/build-push-action@v5
         with:
@@ -54,7 +54,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ GHCR_PAT }}
+          password: ${{ secrets.GHCR_PAT }}
       - name: Build & Push Frontend
         uses: docker/build-push-action@v5
         with:
@@ -74,7 +74,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ GHCR_PAT }}
+          password: ${{ secrets.GHCR_PAT }}
       - name: Build & Push Ollama
         uses: docker/build-push-action@v5
         with:
@@ -94,7 +94,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ GHCR_PAT }}
+          password: ${{ secrets.GHCR_PAT }}
       - name: Build & Push RabbitMQ
         uses: docker/build-push-action@v5
         with:
@@ -114,7 +114,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ GHCR_PAT }}
+          password: ${{ secrets.GHCR_PAT }}
       - name: Build & Push Rag Backend
         uses: docker/build-push-action@v5
         with:
@@ -133,7 +133,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ GHCR_PAT }}
+          password: ${{ secrets.GHCR_PAT }}
       - name: Build & Push Postgres
         uses: docker/build-push-action@v5
         with:
@@ -154,7 +154,7 @@ jobs:
         run: docker pull redis:8.4.0
       - name: Tag and Push Redis to GHCR
         run: |
-          echo ${{ GHCR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker tag redis:8.4.0 ghcr.io/mostafaosmanfathi/ragmind/redis-database:latest
           docker tag redis:8.4.0 ghcr.io/mostafaosmanfathi/ragmind/redis-database:${{ github.ref_name }}
           docker push ghcr.io/mostafaosmanfathi/ragmind/redis-database:latest
@@ -170,7 +170,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ GHCR_PAT }}
+          password: ${{ secrets.GHCR_PAT }}
       - name: Build & Push n8n
         uses: docker/build-push-action@v5
         with:

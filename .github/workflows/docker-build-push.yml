@@ -26,7 +26,6 @@ jobs:
 
   rag-service:
     runs-on: ubuntu-latest
-    needs: [reverse-proxy]
     steps:
       - uses: actions/checkout@v4
       - name: Login to GHCR
@@ -46,7 +45,6 @@ jobs:
 
   frontend:
     runs-on: ubuntu-latest
-    needs: [reverse-proxy]
     steps:
       - uses: actions/checkout@v4
       - name: Login to GHCR
@@ -66,7 +64,6 @@ jobs:
 
   ollama:
     runs-on: ubuntu-latest
-    needs: [rag-service]
     steps:
       - uses: actions/checkout@v4
       - name: Login to GHCR
@@ -86,7 +83,6 @@ jobs:
 
   rabbitmq:
     runs-on: ubuntu-latest
-    needs: [rag-service]
     steps:
       - uses: actions/checkout@v4
       - name: Login to GHCR
@@ -106,7 +102,6 @@ jobs:
 
   rag-backend:
     runs-on: ubuntu-latest
-    needs: [rabbitmq, pg-database]
     steps:
       - uses: actions/checkout@v4
       - name: Login to GHCR
@@ -162,7 +157,6 @@ jobs:
 
   n8n:
     runs-on: ubuntu-latest
-    needs: [rag-backend]
     steps:
       - uses: actions/checkout@v4
       - name: Login to GHCR

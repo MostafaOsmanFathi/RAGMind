@@ -94,8 +94,8 @@ services:
     volumes:
       - n8n_volume:/home/node/.n8n
     networks:
-      backend-tier:
-      reverse-proxy-tier:
+      - backend-tier
+      - reverse-proxy-tier
 
 volumes:
   chromadb_volume:

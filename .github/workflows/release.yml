@@ -1,36 +1,29 @@
 name: release
 
 on:
-  workflow_run:
-    workflows: ["Build & Push All Docker Images"]
-    types:
-      - completed
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Extract tag
-        id: tag
-        run: |
-          echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
-
       - name: Render docker-compose
         run: |
-          sed "s/{{TAG}}/${{ steps.tag.outputs.TAG }}/g" \
+          sed "s/{{TAG}}/${GITHUB_REF##*/}/g" \
             .github/templates/docker-compose.template.yml \
             > docker-compose.yml
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tag.outputs.TAG }}
-          name: Release ${{ steps.tag.outputs.TAG }}
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           files: docker-compose.yml
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

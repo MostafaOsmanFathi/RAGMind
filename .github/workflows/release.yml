@@ -24,6 +24,27 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
+          body: |
+                This release includes the generated docker-compose.yml for version ${{ github.ref_name }}.
+          
+                **How to use:**
+                1. Download the attached `docker-compose.yml` file from the release assets.
+                2. Ensure Docker and Docker Compose are installed on your machine.
+                3. Run:
+                   ```bash
+                   docker-compose up -d
+                   ```
+                4. Services included:
+                   - reverse-proxy
+                   - rag-service
+                   - frontend
+                   - rag-backend
+                   - pg_database
+                   - redis_database
+                   - n8n
+                   - ollama
+                   - rabbitmq
+                5. Modify `.env` or configuration files if needed for your environment.
           files: docker-compose.yml
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
